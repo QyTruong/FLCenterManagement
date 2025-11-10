@@ -1,0 +1,21 @@
+[{
+  "name" : "Giao tiếp",
+  "image" : "static/images/course.jpg",
+  "description": "Rèn luyện kỹ năng giao tiếp",
+  "level_id" : 1
+}, {
+  "name" : "Luyện thi THPT",
+  "image" : "static/images/course.jpg",
+  "description": "Rèn luyện kỹ năng làm đề",
+  "level_id" : 1
+}, {
+  "name" : "Luyện viết",
+  "image" : "static/images/course.jpg",
+  "description": "Viết văn, email, cv",
+  "level_id" : 2
+}, {
+  "name" : "Luyện nghe",
+  "image" : "static/images/course.jpg",
+  "description": "Luyện nghe radio, tivi show, âm nhạc",
+  "level_id" : 3
+}]
