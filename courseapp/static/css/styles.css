@@ -1,0 +1,10 @@
+.card {
+    border-radius: 20px;
+}
+
+table caption {
+  caption-side: top; /* hoặc bottom */
+  font-weight: bold;
+  font-size: 1.2rem;
+  padding: 8px;
+}

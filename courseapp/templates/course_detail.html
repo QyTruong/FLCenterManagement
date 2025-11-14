@@ -1,0 +1,64 @@
+{% extends 'layout/base.html'  %}
+
+{% block title %}Chi tiết khóa học{% endblock %}
+
+{% block content %}
+
+<h1 class="subject text-center p-4">Chi tiết khóa học</h1>
+
+<section class="container-fluid p-5">
+    <div class="row">
+        <div class="col-md-7 col-xs-12">
+        <h2 class="text-center">Bài học</h2>
+        {% for l in lessons %}
+            <div class="card bg-info mt-3">
+                <div class="card-header font-weight-bold" style="font-size: 1.8rem">Tiêu đề: {{ l.title }} ({{ l.course }})</div>
+                <div class="card-body">
+                    <a href="" style="color: white">Nội dung: {{ l.content }}</a>
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+        <div class="col-md-5 col-xs-12">
+            <div class="card text-center">
+                <div class="card-header"><h2>Thông tin khóa học</h2></div>
+                <div class="card-body">
+                    <h1>{{ course.name }}</h1>
+                    <p style="font-size: 1.6rem">Mô tả: {{ course.description }}</p>
+                    <p style="font-size: 1.6rem">Học phí: {{ course.price }}</p>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-danger btn-lg">Đăng ký ngay</button>
+                </div>
+            </div>
+
+            <br>
+            <hr>
+            <br>
+
+            <table class="table table-bordered">
+                <caption class="text-center">Chọn lớp</caption>
+                <thead>
+                    <tr>
+                      <th>Tên lớp</th>
+                      <th>Sĩ số lớp</th>
+                      <th>Chọn</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>5</td>
+                        <td>6</td>
+                        <td>7</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<br>
+<hr>
+<br>
+
+{% endblock %}

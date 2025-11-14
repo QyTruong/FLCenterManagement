@@ -1,21 +1,16 @@
 [{
-  "name" : "Giao tiếp",
+  "name" : "Beginner",
   "image" : "static/images/course.jpg",
-  "description": "Rèn luyện kỹ năng giao tiếp",
-  "level_id" : 1
+  "description": "Khóa học dành cho người mới bắt đầu, mất gốc, hỏng kiến thức",
+  "price" : 500000
 }, {
-  "name" : "Luyện thi THPT",
+  "name" : "Intermediate",
   "image" : "static/images/course.jpg",
-  "description": "Rèn luyện kỹ năng làm đề",
-  "level_id" : 1
+  "description": "Khóa học dành cho người học để đi làm, phục vụ trong công việc",
+  "price" : 1000000
 }, {
-  "name" : "Luyện viết",
+  "name" : "Advanced",
   "image" : "static/images/course.jpg",
-  "description": "Viết văn, email, cv",
-  "level_id" : 2
-}, {
-  "name" : "Luyện nghe",
-  "image" : "static/images/course.jpg",
-  "description": "Luyện nghe radio, tivi show, âm nhạc",
-  "level_id" : 3
+  "description": "Khóa học dành cho người thi chứng chỉ phục vụ cho việc xuất ngoại",
+  "price" : 1500000
 }]

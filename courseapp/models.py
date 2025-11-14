@@ -1,6 +1,5 @@
 import json
-
-from sqlalchemy import Integer, ForeignKey, DateTime, String, Column, Enum, Float
+from sqlalchemy import Integer, ForeignKey, DateTime, String, Column, Enum, Float, Boolean
 from sqlalchemy.orm import relationship
 from courseapp import app, db
 from datetime import datetime
@@ -21,7 +20,9 @@ class Result(Type):
 
 class BaseModel(db.Model):
     __abstract__ = True
+
     id = Column(Integer, primary_key=True, autoincrement=True)
+    active = Column(Boolean, default=True)
 
 class User(BaseModel):
     __abstract__ = True
@@ -35,27 +36,28 @@ class User(BaseModel):
     def __str__(self):
         return self.name
 
-class Level(BaseModel):
-    __tablename__ = 'level'
-
-    name = Column(String(50), nullable=False)
-    image = Column(String(50), nullable=True)
-    price = Column(Float, nullable=False)
-    courses = relationship('Course', backref='level', lazy=True)
-
-    def __str__(self):
-        return self.name
-
 class Course(BaseModel):
     __tablename__ = 'course'
 
     name = Column(String(50), nullable=False)
-    image = Column(String(50), nullable=True)
+    image = Column(String(100), nullable=True)
     description = Column(String(255), nullable=True)
-    level_id = Column(Integer, ForeignKey(Level.id), nullable=False)
+    price = Column(Float, nullable=False)
+
+    lessons = relationship('Lesson', backref='course', lazy=True)
 
     def __str__(self):
         return self.name
+
+class Lesson(BaseModel):
+    __tablename__ = 'lesson'
+
+    title = Column(String(50), nullable=False)
+    content = Column(String(255), nullable=True)
+    course_id = Column(Integer, ForeignKey('course.id'), nullable=False)
+
+    def __str__(self):
+        return self.title
 
 class Student(User):
     __tablename__ = 'student'
@@ -114,21 +116,22 @@ class Score(BaseModel):
 
 if __name__ == '__main__':
     with app.app_context():
-        #db.drop_all()
-        db.create_all()
-        # db.metadata.clear()
-
-        # Level
-        l1 = Level(name='Beginner', image='static/images/beginner.png', price=500000)
-        l2 = Level(name='Intermediate', image='static/images/intermediate.jpg', price=1500000)
-        l3 = Level(name='Advanced', image='static/images/advanced.jpg', price=2000000)
-        db.session.add_all([l1, l2, l3])
-        db.session.commit()
+        # db.drop_all()
+        # db.create_all()
 
         # Course
-        with open('data/courses.json', 'r', encoding='utf-8') as f:
+        # with open('data/courses.json', 'r', encoding='utf-8') as f:
+        #     data = json.load(f)
+        #     for course in data:
+        #         c = Course(**course)
+        #         db.session.add(c)
+        #     db.session.commit()
+
+        # Lesson
+        with open('data/lessons.json', 'r', encoding='utf-8') as f:
             data = json.load(f)
             for course in data:
-                c = Course(**course)
-                db.session.add(c)
+                l = Lesson(**course)
+                db.session.add(l)
             db.session.commit()
+
