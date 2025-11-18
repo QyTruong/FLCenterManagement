@@ -1,3 +1,9 @@
+/* common */
+.btn-lg {
+    width: 150px
+}
+
+/* course register */
 .card {
     border-radius: 20px;
 }
@@ -8,3 +14,50 @@ table caption {
   font-size: 1.2rem;
   padding: 8px;
 }
+
+.card-body > * {
+    margin-top: 20px;
+}
+
+.card-title {
+    font-size: 35px;
+}
+
+.card-text {
+    font-size: 20px;
+}
+
+/* course-detail */
+.table th,
+.table td {
+  border-width: 5px !important;
+}
+
+.table > caption {
+     font-size: 35px;
+     color: black;
+}
+
+.register-panel {
+    border: 3px solid black;
+}
+
+.register-panel > .title {
+    font-size: 35px;
+    font-weight: bold;
+}
+
+.register-panel > * {
+    margin-top: 15px;
+    text-align: center;
+}
+
+.register-panel > .price {
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.register-panel > .desc {
+    font-size: 25px;
+}
+

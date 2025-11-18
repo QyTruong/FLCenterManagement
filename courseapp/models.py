@@ -1,5 +1,5 @@
 import json
-from sqlalchemy import Integer, ForeignKey, DateTime, String, Column, Enum, Float, Boolean
+from sqlalchemy import Integer, ForeignKey, DateTime, String, Column, Enum, Float, Boolean, Time, Date
 from sqlalchemy.orm import relationship
 from courseapp import app, db
 from datetime import datetime
@@ -25,13 +25,15 @@ class BaseModel(db.Model):
     active = Column(Boolean, default=True)
 
 class User(BaseModel):
-    __abstract__ = True
     name = Column(String(50), nullable=False)
     username = Column(String(50), nullable=False)
     password = Column(String(50), nullable=False)
     email = Column(String(50), nullable=False)
     avatar = Column(String(50), nullable=False)
     user_role = Column(Enum(UserRole), default=UserRole.STUDENT)
+
+    student = relationship("Student", backref="user", lazy=True, uselist=False)
+    teacher = relationship("Teacher", backref="user", lazy=True, uselist=False)
 
     def __str__(self):
         return self.name
@@ -59,14 +61,15 @@ class Lesson(BaseModel):
     def __str__(self):
         return self.title
 
-class Student(User):
+class Student(db.Model):
     __tablename__ = 'student'
-
+    id = Column(Integer, ForeignKey('user.id'), primary_key=True, unique=True, nullable=False)
     registers = relationship('Register', backref='student', lazy=True)
 
-class Teacher(User):
+class Teacher(db.Model):
     __tablename__ = 'teacher'
 
+    id = Column(Integer, ForeignKey('user.id'), primary_key=True, unique=True, nullable=False)
     specialization = Column(String(50), nullable=False)
 
     classes = relationship('Class', backref='teacher', lazy=True)
@@ -76,17 +79,29 @@ class Class(BaseModel):
     __tablename__ = 'class'
 
     name = Column(String(50), nullable=False)
-    start_date = Column(DateTime, nullable=False)
-    end_date = Column(DateTime, nullable=False)
-    schedule = Column(String(50), nullable=False)
+    start_date = Column(Date, nullable=False)
+    end_date = Column(Date, nullable=False)
     max_student = Column(Integer, default=50, nullable=False)
-    teacher_id = Column(Integer, ForeignKey(Teacher.id), nullable=False)
-    course_id = Column(Integer, ForeignKey(Course.id), nullable=False)
+    teacher_id = Column(Integer, ForeignKey(Teacher.id), nullable=True)
+    course_id = Column(Integer, ForeignKey(Course.id), nullable=True)
 
     registers = relationship('Register', backref='class', lazy=True)
+    schedules = relationship('Schedule', backref='class', lazy=True)
 
     def __str__(self):
         return self.name
+
+class Schedule(BaseModel):
+    __tablename__ = 'schedule'
+
+    day_of_week = Column(String(15), nullable=False)
+    start_time = Column(Time, nullable=False)
+    end_time = Column(Time, nullable=False)
+    class_id = Column(Integer, ForeignKey(Class.id), nullable=False)
+
+    def __str__(self):
+        return f"{self.day_of_week}   {self.start_time} - {self.end_time}"
+
 
 class Register(BaseModel):
     __tablename__ = 'register'
@@ -97,14 +112,15 @@ class Register(BaseModel):
     status = Column(Enum(Status), nullable=False)
 
     scores = relationship('Score', backref='register', lazy=True)
-    invoice = relationship("Invoice", backref="register", uselist=False)
+    invoice = relationship("Invoice", backref="register", lazy=True, uselist=False)
 
 class Invoice(BaseModel):
     __tablename__ = 'invoice'
 
+    id = Column(Integer, ForeignKey('register.id'), primary_key=True)
     amount = Column(Float, nullable=False)
     payment_date = Column(DateTime, default=datetime.now())
-    register_id = Column(Integer, ForeignKey('register.id'), unique=True)
+
 
 class Score(BaseModel):
     __tablename__ = 'score'
@@ -112,20 +128,20 @@ class Score(BaseModel):
     score = Column(Float, nullable=False)
     type = Column(String(50), nullable=False)
     result = Column(Enum(Result), nullable=False)
-    register_id = Column(Integer, ForeignKey(Register.id), nullable=False)
+    register_id = Column(Integer, ForeignKey(Register.id), unique=True)
 
 if __name__ == '__main__':
     with app.app_context():
-        # db.drop_all()
-        # db.create_all()
+        #db.drop_all()
+        #db.create_all()
 
         # Course
-        # with open('data/courses.json', 'r', encoding='utf-8') as f:
-        #     data = json.load(f)
-        #     for course in data:
-        #         c = Course(**course)
-        #         db.session.add(c)
-        #     db.session.commit()
+        with open('data/courses.json', 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            for course in data:
+                c = Course(**course)
+                db.session.add(c)
+            db.session.commit()
 
         # Lesson
         with open('data/lessons.json', 'r', encoding='utf-8') as f:
@@ -133,5 +149,21 @@ if __name__ == '__main__':
             for course in data:
                 l = Lesson(**course)
                 db.session.add(l)
+            db.session.commit()
+
+        # Class
+        with open('data/classes.json', 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            for cls in data:
+                c = Class(**cls)
+                db.session.add(c)
+            db.session.commit()
+
+        # Schedule
+        with open('data/schedules.json', 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            for sc in data:
+                s = Schedule(**sc)
+                db.session.add(s)
             db.session.commit()
 

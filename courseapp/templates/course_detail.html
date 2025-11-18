@@ -4,61 +4,79 @@
 
 {% block content %}
 
-<h1 class="subject text-center p-4">Chi tiết khóa học</h1>
+<h1 class="text-center p-4"><b>Chi tiết khóa học</b></h1>
 
-<section class="container-fluid p-5">
-    <div class="row">
-        <div class="col-md-7 col-xs-12">
-        <h2 class="text-center">Bài học</h2>
-        {% for l in lessons %}
-            <div class="card bg-info mt-3">
-                <div class="card-header font-weight-bold" style="font-size: 1.8rem">Tiêu đề: {{ l.title }} ({{ l.course }})</div>
-                <div class="card-body">
-                    <a href="" style="color: white">Nội dung: {{ l.content }}</a>
-                </div>
+<div class="row">
+    <!-- Danh sách bài học -->
+    <div class="col-md-6 col-xs-12">
+        <table class="table table-bordered">
+            <caption class="text-center">Nội dung bài học</caption>
+            <thead>
+            <tr>
+                <th>Tên bài học</th>
+                <th style="text-align: center;">Nội dung</th>
+            </tr>
+            </thead>
+            {% for l in lessons %}
+            <tbody>
+            <tr>
+                <td>{{ l.title }}</td>
+                <td style="text-align: center"><a href="#" class="btn btn-primary">Xem chi tiết</a></td>
+            </tr>
+            </tbody>
+            {% endfor %}
+        </table>
+    </div>
+
+    <!-- Bảng đăng ký chi tiết -->
+    <div class="col-md-6 col-xs-12">
+        <div class="d-flex flex-column register-panel">
+            <div class="text-center title">{{ course.name }}</div>
+            <img src="{{ url_for('static', filename='images/course.jpg') }}" alt="{{ course.name }}">
+            <div class="price">Giá tiền: {{ course.price }} VND</div>
+            <div class="desc"><b>Mô tả:</b> {{ course.description }}</div>
+            <div class="p-2">
+                <button type="button" class="btn btn-danger btn-lg mr-5" data-toggle="modal" data-target="#myModal">Đăng
+                    ký
+                </button>
             </div>
-        {% endfor %}
-        </div>
-        <div class="col-md-5 col-xs-12">
-            <div class="card text-center">
-                <div class="card-header"><h2>Thông tin khóa học</h2></div>
-                <div class="card-body">
-                    <h1>{{ course.name }}</h1>
-                    <p style="font-size: 1.6rem">Mô tả: {{ course.description }}</p>
-                    <p style="font-size: 1.6rem">Học phí: {{ course.price }}</p>
-                </div>
-                <div class="card-footer">
-                    <button class="btn btn-danger btn-lg">Đăng ký ngay</button>
-                </div>
-            </div>
-
-            <br>
-            <hr>
-            <br>
-
-            <table class="table table-bordered">
-                <caption class="text-center">Chọn lớp</caption>
-                <thead>
-                    <tr>
-                      <th>Tên lớp</th>
-                      <th>Sĩ số lớp</th>
-                      <th>Chọn</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>5</td>
-                        <td>6</td>
-                        <td>7</td>
-                    </tr>
-                </tbody>
-            </table>
         </div>
     </div>
-</section>
+</div>
 
-<br>
-<hr>
-<br>
+
+<form action="" class="text-center">
+    <table class="table table-bordered mt-3">
+        <caption class="text-center">Hãy chọn lớp</caption>
+        <thead>
+        <tr>
+            <th>Tên lớp</th>
+            <th>Ngày học</th>
+            <th>Sĩ số lớp</th>
+            <th>Chọn</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for c in classes %}
+        <tr>
+            <td>{{ c.name }}</td>
+            <td>
+                {% for s in c.schedules %}
+                {{ s.day_of_week }} {% if not loop.last %}
+                -
+                {% else %} {{ s.start_time }} - {{ s.end_time }}
+                {% endif %}
+                {% endfor %}
+            </td>
+            <td>.../{{ c.max_student }}</td>
+            <td><input type="radio" name="class_id" value="{{ c.id }}"></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <button type="submit" class="btn btn-primary btn-lg mr-3">Xác nhận</button>
+    <button type="submit" class="btn btn-danger btn-lg">Hủy</button>
+</form>
+
 
 {% endblock %}

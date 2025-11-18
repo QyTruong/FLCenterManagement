@@ -1,0 +1,91 @@
+[{
+  "day_of_week" : "T2",
+  "start_time" : "9:00:00",
+  "end_time" : "12:00:00",
+  "class_id" : 1
+}, {
+  "day_of_week" : "T2",
+  "start_time" : "9:00:00",
+  "end_time" : "12:00:00",
+  "class_id" : 3
+}, {
+  "day_of_week" : "T2",
+  "start_time" : "9:00:00",
+  "end_time" : "12:00:00",
+  "class_id" : 5
+}, {
+  "day_of_week" : "T4",
+  "start_time" : "9:00:00",
+  "end_time" : "12:00:00",
+  "class_id" : 1
+}, {
+  "day_of_week" : "T4",
+  "start_time" : "9:00:00",
+  "end_time" : "12:00:00",
+  "class_id" : 3
+}, {
+  "day_of_week" : "T4",
+  "start_time" : "9:00:00",
+  "end_time" : "12:00:00",
+  "class_id" : 5
+}, {
+  "day_of_week" : "T6",
+  "start_time" : "9:00:00",
+  "end_time" : "12:00:00",
+  "class_id" : 1
+}, {
+  "day_of_week" : "T6",
+  "start_time" : "9:00:00",
+  "end_time" : "12:00:00",
+  "class_id" : 3
+}, {
+  "day_of_week" : "T6",
+  "start_time" : "9:00:00",
+  "end_time" : "12:00:00",
+  "class_id" : 5
+}, {
+  "day_of_week" : "T3",
+  "start_time" : "9:00:00",
+  "end_time" : "12:00:00",
+  "class_id" : 2
+}, {
+  "day_of_week" : "T3",
+  "start_time" : "9:00:00",
+  "end_time" : "12:00:00",
+  "class_id" : 4
+}, {
+  "day_of_week" : "T3",
+  "start_time" : "9:00:00",
+  "end_time" : "12:00:00",
+  "class_id" : 6
+}, {
+  "day_of_week" : "T5",
+  "start_time" : "9:00:00",
+  "end_time" : "12:00:00",
+  "class_id" : 2
+}, {
+  "day_of_week" : "T5",
+  "start_time" : "9:00:00",
+  "end_time" : "12:00:00",
+  "class_id" : 4
+}, {
+  "day_of_week" : "T5",
+  "start_time" : "9:00:00",
+  "end_time" : "12:00:00",
+  "class_id" : 6
+}, {
+  "day_of_week" : "T7",
+  "start_time" : "9:00:00",
+  "end_time" : "12:00:00",
+  "class_id" : 2
+}, {
+  "day_of_week" : "T7",
+  "start_time" : "9:00:00",
+  "end_time" : "12:00:00",
+  "class_id" : 4
+}, {
+  "day_of_week" : "T7",
+  "start_time" : "9:00:00",
+  "end_time" : "12:00:00",
+  "class_id" : 6
+}]

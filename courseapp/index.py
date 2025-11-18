@@ -6,18 +6,19 @@ def index():
 
     return render_template('index.html')
 
-@app.route('/course')
-def course_register():
-    courses = dao.load_courses()
+@app.route('/courses')
+def course_list():
+    courses = dao.get_courses()
 
     return render_template('course_register.html', courses=courses)
 
-@app.route('/course/<course_id>')
+@app.route('/courses/<int:course_id>')
 def course_detail(course_id):
-    lessons = dao.load_lessons(course_id)
-    course = dao.load_course_by_id(course_id)
+    lessons = dao.get_lessons(course_id)
+    course = dao.get_course_by_id(course_id)
+    classes = dao.get_classes(course_id)
 
-    return render_template('course_detail.html', lessons=lessons, course=course)
+    return render_template('course_detail.html', lessons=lessons, course=course, classes=classes)
 
 
 if __name__ == '__main__':
