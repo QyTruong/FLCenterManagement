@@ -4,6 +4,8 @@
 
 {% block content %}
 
+{% include 'components/modal_class.html' %}
+
 <h1 class="text-center p-4"><b>Chi tiết khóa học</b></h1>
 
 <div class="row">
@@ -36,47 +38,19 @@
             <div class="price">Giá tiền: {{ course.price }} VND</div>
             <div class="desc"><b>Mô tả:</b> {{ course.description }}</div>
             <div class="p-2">
-                <button type="button" class="btn btn-danger btn-lg mr-5" data-toggle="modal" data-target="#myModal">Đăng
+                <button type="button" class="btn btn-danger btn-lg" data-toggle="modal" data-target="#myFormModal" onclick="classRegisterModal({{ course.id }})">Đăng
                     ký
+                </button>
+                <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myFormModal" onclick="classRegisterModal({{ course.id }})">
+                    Chọn lớp
                 </button>
             </div>
         </div>
     </div>
 </div>
 
-
-<form action="" class="text-center">
-    <table class="table table-bordered mt-3">
-        <caption class="text-center">Hãy chọn lớp</caption>
-        <thead>
-        <tr>
-            <th>Tên lớp</th>
-            <th>Ngày học</th>
-            <th>Sĩ số lớp</th>
-            <th>Chọn</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for c in classes %}
-        <tr>
-            <td>{{ c.name }}</td>
-            <td>
-                {% for s in c.schedules %}
-                {{ s.day_of_week }} {% if not loop.last %}
-                -
-                {% else %} {{ s.start_time }} - {{ s.end_time }}
-                {% endif %}
-                {% endfor %}
-            </td>
-            <td>.../{{ c.max_student }}</td>
-            <td><input type="radio" name="class_id" value="{{ c.id }}"></td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    <button type="submit" class="btn btn-primary btn-lg mr-3">Xác nhận</button>
-    <button type="submit" class="btn btn-danger btn-lg">Hủy</button>
-</form>
-
+<br>
+<hr>
+<br>
 
 {% endblock %}
