@@ -1,5 +1,7 @@
 from flask import render_template, request, jsonify
 from courseapp import app, dao
+from flask_login import login_user, logout_user
+
 
 @app.route('/')
 def index():
@@ -28,7 +30,6 @@ def class_list(course_id):
     for c in classes:
         schedule_list = []
 
-        # duyệt từng lịch học
         for s in c.schedules:
             schedule_list.append({
                 'day_of_week' : s.day_of_week,
@@ -44,6 +45,15 @@ def class_list(course_id):
         })
 
     return jsonify(data)
+
+@app.route('/register-account')
+def register_account():
+    return render_template('account_register.html')
+
+@app.route('/login-account')
+def login_account():
+    return render_template('account_login.html')
+
 
 if __name__ == '__main__':
     from courseapp.admin import admin

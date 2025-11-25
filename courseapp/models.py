@@ -5,14 +5,10 @@ from courseapp import app, db
 from datetime import datetime
 from enum import Enum as Type
 
-class UserRole(Type):
-    ADMIN = 1
-    STUDENT = 2
-    TEACHER = 3
-
 class Status(Type):
-    REGISTERED = 1
-    PAID = 2
+    UNREGISTER = 1
+    REGISTERED = 2
+    PAID = 3
 
 class Result(Type):
     SUCCESS = 1
@@ -25,15 +21,47 @@ class BaseModel(db.Model):
     active = Column(Boolean, default=True)
 
 class User(BaseModel):
-    name = Column(String(50), nullable=False)
     username = Column(String(50), nullable=False)
     password = Column(String(50), nullable=False)
-    email = Column(String(50), nullable=False)
-    avatar = Column(String(50), nullable=False)
-    user_role = Column(Enum(UserRole), default=UserRole.STUDENT)
 
+    admin = relationship("Admin", backref="user", lazy=True, uselist=False)
     student = relationship("Student", backref="user", lazy=True, uselist=False)
     teacher = relationship("Teacher", backref="user", lazy=True, uselist=False)
+
+
+class Admin(db.Model):
+    __tablename__ = 'admin'
+    id = Column(Integer, ForeignKey('user.id'), primary_key=True, unique=True, nullable=False)
+    name = Column(String(50), nullable=False)
+    email = Column(String(50), nullable=False)
+    avatar = Column(String(50), nullable=False)
+
+    def __str__(self):
+        return self.name
+
+class Student(db.Model):
+    __tablename__ = 'student'
+    id = Column(Integer, ForeignKey('user.id'), primary_key=True, unique=True, nullable=False)
+    name = Column(String(50), nullable=False)
+    email = Column(String(50), nullable=False)
+    avatar = Column(String(50), nullable=False)
+
+    registers = relationship('Register', backref='student', lazy=True)
+
+    def __str__(self):
+        return self.name
+
+
+class Teacher(db.Model):
+    __tablename__ = 'teacher'
+
+    id = Column(Integer, ForeignKey('user.id'), primary_key=True, unique=True, nullable=False)
+    name = Column(String(50), nullable=False)
+    email = Column(String(50), nullable=False)
+    avatar = Column(String(50), nullable=False)
+    specialization = Column(String(50), nullable=True)
+
+    classes = relationship('Class', backref='teacher', lazy=True)
 
     def __str__(self):
         return self.name
@@ -60,20 +88,6 @@ class Lesson(BaseModel):
 
     def __str__(self):
         return self.title
-
-class Student(db.Model):
-    __tablename__ = 'student'
-    id = Column(Integer, ForeignKey('user.id'), primary_key=True, unique=True, nullable=False)
-    registers = relationship('Register', backref='student', lazy=True)
-
-class Teacher(db.Model):
-    __tablename__ = 'teacher'
-
-    id = Column(Integer, ForeignKey('user.id'), primary_key=True, unique=True, nullable=False)
-    specialization = Column(String(50), nullable=False)
-
-    classes = relationship('Class', backref='teacher', lazy=True)
-
 
 class Class(BaseModel):
     __tablename__ = 'class'
@@ -109,7 +123,7 @@ class Register(BaseModel):
     student_id = Column(Integer, ForeignKey(Student.id), nullable=False)
     class_id = Column(Integer, ForeignKey(Class.id), nullable=False)
     register_date = Column(DateTime, default=datetime.now())
-    status = Column(Enum(Status), nullable=False)
+    status = Column(Enum(Status), nullable=False, default=Status.UNREGISTER)
 
     scores = relationship('Score', backref='register', lazy=True)
     invoice = relationship("Invoice", backref="register", lazy=True, uselist=False)
@@ -132,8 +146,8 @@ class Score(BaseModel):
 
 if __name__ == '__main__':
     with app.app_context():
-        #db.drop_all()
-        #db.create_all()
+        db.drop_all()
+        db.create_all()
 
         # Course
         with open('data/courses.json', 'r', encoding='utf-8') as f:
@@ -167,3 +181,34 @@ if __name__ == '__main__':
                 db.session.add(s)
             db.session.commit()
 
+        #User
+        with open('data/users.json', 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            for us in data:
+                u = User(**us)
+                db.session.add(u)
+            db.session.commit()
+
+        # Admin
+        with open('data/admin.json', 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            for ad in data:
+                a = Admin(**ad)
+                db.session.add(a)
+            db.session.commit()
+
+        #Student
+        with open('data/students.json', 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            for st in data:
+                s = Student(**st)
+                db.session.add(s)
+            db.session.commit()
+
+        # Teacher
+        with open('data/teachers.json', 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            for te in data:
+                t = Teacher(**te)
+                db.session.add(t)
+            db.session.commit()
