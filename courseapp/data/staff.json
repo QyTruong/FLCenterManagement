@@ -1,6 +1,6 @@
 [{
   "id" : 1,
-  "name" : "Admin",
-  "email" : "admin@gmail.com",
+  "name" : "Staff",
+  "email" : "staff@gmail.com",
   "avatar" : "static/images/course.jpg"
 }]

@@ -4,9 +4,10 @@ from sqlalchemy.orm import relationship
 from courseapp import app, db
 from datetime import datetime
 from enum import Enum as Type
+from flask_login import UserMixin
 
 class Status(Type):
-    UNREGISTER = 1
+    UNREGISTERED = 1
     REGISTERED = 2
     PAID = 3
 
@@ -20,21 +21,40 @@ class BaseModel(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
     active = Column(Boolean, default=True)
 
-class User(BaseModel):
-    username = Column(String(50), nullable=False)
+class User(BaseModel, UserMixin):
+    def __init__(self, username, password, staff=None, student=None, teacher=None):
+        self.username = username
+        self.password = password
+        self.staff = staff
+        self.student = student
+        self.teacher = teacher
+
+    username = Column(String(50), unique=True, nullable=False)
     password = Column(String(50), nullable=False)
 
-    admin = relationship("Admin", backref="user", lazy=True, uselist=False)
+    staff = relationship("Staff", backref="user", lazy=True, uselist=False)
     student = relationship("Student", backref="user", lazy=True, uselist=False)
     teacher = relationship("Teacher", backref="user", lazy=True, uselist=False)
 
+    @property
+    def role(self):
+        if self.staff:
+            return self.staff
+        elif self.student:
+            return self.student
+        elif self.teacher:
+            return self.teacher
+        return None
 
-class Admin(db.Model):
-    __tablename__ = 'admin'
+class Staff(db.Model):
+    __tablename__ = 'staff'
     id = Column(Integer, ForeignKey('user.id'), primary_key=True, unique=True, nullable=False)
     name = Column(String(50), nullable=False)
     email = Column(String(50), nullable=False)
-    avatar = Column(String(50), nullable=False)
+    avatar = Column(String(255), nullable=False)
+
+    invoices = relationship("Invoice", backref="staff", lazy=True)
+
 
     def __str__(self):
         return self.name
@@ -44,7 +64,7 @@ class Student(db.Model):
     id = Column(Integer, ForeignKey('user.id'), primary_key=True, unique=True, nullable=False)
     name = Column(String(50), nullable=False)
     email = Column(String(50), nullable=False)
-    avatar = Column(String(50), nullable=False)
+    avatar = Column(String(255), nullable=True)
 
     registers = relationship('Register', backref='student', lazy=True)
 
@@ -58,7 +78,7 @@ class Teacher(db.Model):
     id = Column(Integer, ForeignKey('user.id'), primary_key=True, unique=True, nullable=False)
     name = Column(String(50), nullable=False)
     email = Column(String(50), nullable=False)
-    avatar = Column(String(50), nullable=False)
+    avatar = Column(String(255), nullable=False)
     specialization = Column(String(50), nullable=True)
 
     classes = relationship('Class', backref='teacher', lazy=True)
@@ -75,6 +95,7 @@ class Course(BaseModel):
     price = Column(Float, nullable=False)
 
     lessons = relationship('Lesson', backref='course', lazy=True)
+    registers = relationship('Register', backref='course', lazy=True)
 
     def __str__(self):
         return self.name
@@ -99,7 +120,6 @@ class Class(BaseModel):
     teacher_id = Column(Integer, ForeignKey(Teacher.id), nullable=True)
     course_id = Column(Integer, ForeignKey(Course.id), nullable=True)
 
-    registers = relationship('Register', backref='class', lazy=True)
     schedules = relationship('Schedule', backref='class', lazy=True)
 
     def __str__(self):
@@ -121,19 +141,22 @@ class Register(BaseModel):
     __tablename__ = 'register'
 
     student_id = Column(Integer, ForeignKey(Student.id), nullable=False)
-    class_id = Column(Integer, ForeignKey(Class.id), nullable=False)
+    course_id = Column(Integer, ForeignKey(Course.id), nullable=False)
     register_date = Column(DateTime, default=datetime.now())
-    status = Column(Enum(Status), nullable=False, default=Status.UNREGISTER)
+    unit_price = Column(Float, nullable=True)
+    status = Column(Enum(Status), nullable=False, default=Status.UNREGISTERED)
+    invoice_id = Column(Integer, ForeignKey('invoice.id'), nullable=True)
 
     scores = relationship('Score', backref='register', lazy=True)
-    invoice = relationship("Invoice", backref="register", lazy=True, uselist=False)
 
 class Invoice(BaseModel):
     __tablename__ = 'invoice'
 
-    id = Column(Integer, ForeignKey('register.id'), primary_key=True)
     amount = Column(Float, nullable=False)
     payment_date = Column(DateTime, default=datetime.now())
+    staff_id = Column(Integer, ForeignKey(Staff.id), nullable=False)
+
+    registers = relationship(Register, backref='invoice', lazy=True)
 
 
 class Score(BaseModel):
@@ -190,10 +213,10 @@ if __name__ == '__main__':
             db.session.commit()
 
         # Admin
-        with open('data/admin.json', 'r', encoding='utf-8') as f:
+        with open('data/staff.json', 'r', encoding='utf-8') as f:
             data = json.load(f)
             for ad in data:
-                a = Admin(**ad)
+                a = Staff(**ad)
                 db.session.add(a)
             db.session.commit()
 

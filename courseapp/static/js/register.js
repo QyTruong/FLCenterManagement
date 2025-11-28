@@ -40,3 +40,4 @@ function classRegisterModal(courseId){
         area.innerHTML = html;
     })
 }
+

@@ -1,6 +1,8 @@
-from flask import render_template, request, jsonify
-from courseapp import app, dao
+from flask import render_template, request, jsonify, url_for, session
+from werkzeug.utils import redirect
+from courseapp import app, dao, login
 from flask_login import login_user, logout_user
+import cloudinary.uploader
 
 
 @app.route('/')
@@ -46,13 +48,59 @@ def class_list(course_id):
 
     return jsonify(data)
 
-@app.route('/register-account')
+@app.route('/register-account', methods=['GET', 'POST'])
 def register_account():
-    return render_template('account_register.html')
+    err_msg = ''
 
-@app.route('/login-account')
+    if request.method.__eq__('POST'):
+        name = request.form.get('name')
+        username = request.form.get('username')
+        password = request.form.get('password')
+        confirm = request.form.get('confirm')
+        email = request.form.get('email')
+        avatar_path = None
+
+        try:
+            if password.strip().__eq__(confirm.strip()):
+                avatar = request.files.get('avatar')
+                if avatar:
+                    res = cloudinary.uploader.upload(avatar)
+                    avatar_path = res['secure_url']
+                dao.add_user(name=name, username=username, password=password, email=email, avatar=avatar_path)
+                return redirect(url_for('login_account'))
+            else:
+                err_msg = 'Mật khẩu xác nhận không khớp !!!'
+        except Exception as ex:
+            err_msg = 'Hệ thống đang gặp lỗi' + str(ex) + '!!!'
+
+    return render_template('account_register.html', err_msg=err_msg)
+
+@app.route('/login-account', methods=['GET', 'POST'])
 def login_account():
-    return render_template('account_login.html')
+    err_msg = ''
+
+    if request.method.__eq__('POST'):
+        username = request.form.get('username')
+        password = request.form.get('password')
+
+        user = dao.auth_user(username=username, password=password)
+
+        if user:
+            login_user(user=user)
+            return redirect(url_for('index'))
+        else:
+            err_msg = 'Tài khoản hoặc mật khẩu không đúng'
+
+    return render_template('account_login.html', err_msg=err_msg)
+
+@app.route('/account-logout')
+def logout_account():
+    logout_user()
+    return redirect(url_for('index'))
+
+@login.user_loader
+def load_user(user_id):
+    return dao.get_user_by_id(user_id)
 
 
 if __name__ == '__main__':

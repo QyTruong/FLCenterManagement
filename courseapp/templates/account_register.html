@@ -3,5 +3,47 @@
 {% block title %}Dang ky tai khoan{% endblock %}
 
 {% block content %}
+
+<!--
+    name, username, password, confirm, avatar, email
+-->
+
 <h1 class="text-center">Đăng ký tài khoản</h1>
+
+{% if err_msg %}
+<div class="alert alert-danger">
+    <h4>{{ err_msg }}</h4>
+</div>
+{% endif %}
+
+<form method="post" action="{{ url_for('register_account') }}" enctype="multipart/form-data">
+    <div class="form-floating mt-3 mb-3">
+        <label for="name">Họ tên</label>
+        <input type="text" class="form-control" id="name" placeholder="Họ tên..." name="name" required>
+    </div>
+    <div class="form-floating mt-3 mb-3">
+        <label for="username">Tên đăng nhập</label>
+        <input type="text" class="form-control" id="username" placeholder="Tên đăng nhập..." name="username" required>
+    </div>
+    <div class="form-floating mt-3 mb-3">
+        <label for="pwd">Mật khẩu</label>
+        <input type="password" class="form-control" id="pwd" placeholder="Mật khẩu..." name="password" required>
+    </div>
+    <div class="form-floating mt-3 mb-3">
+        <label for="confirm">Xác nhận mật khẩu</label>
+        <input type="password" class="form-control" id="confirm" placeholder="Xác nhận lại mật khẩu..." name="confirm" required>
+    </div>
+    <div class="form-floating mt-3 mb-3">
+        <label for="email">Email</label>
+        <input type="email" class="form-control" id="email" placeholder="Email..." name="email" required>
+    </div>
+    <div class="form-floating mt-3 mb-3">
+        <label for="avatar">Ảnh đại diện</label>
+        <input type="file" class="form-control" id="avatar" name="avatar">
+    </div>
+    <div class="form-floating mt-3 mb-3">
+        <button type="submit" class="btn btn-danger">Đăng ký</button>
+    </div>
+</form>
+
 {% endblock %}
