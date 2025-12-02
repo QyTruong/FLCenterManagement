@@ -2,15 +2,21 @@
   "name" : "Beginner",
   "image" : "static/images/course.jpg",
   "description": "Khóa học dành cho người mới bắt đầu, mất gốc, hỏng kiến thức",
+  "start_date": "2026-01-01",
+  "end_date": "2026-03-01",
   "price" : 500000
 }, {
   "name" : "Intermediate",
   "image" : "static/images/course.jpg",
   "description": "Khóa học dành cho người học để đi làm, phục vụ trong công việc",
+  "start_date": "2026-01-01",
+  "end_date": "2026-03-01",
   "price" : 1000000
 }, {
   "name" : "Advanced",
   "image" : "static/images/course.jpg",
   "description": "Khóa học dành cho người thi chứng chỉ phục vụ cho việc xuất ngoại",
+  "start_date": "2026-01-01",
+  "end_date": "2026-03-01",
   "price" : 1500000
 }]

@@ -4,47 +4,83 @@
 
 {% block content %}
 
-{% include 'components/modal_class.html' %}
-
 <h1 class="text-center p-4"><b>Chi tiết khóa học</b></h1>
 
 <div class="row">
-    <!-- Danh sách bài học -->
-    <div class="col-md-6 col-xs-12">
-        <table class="table table-bordered">
-            <caption class="text-center">Nội dung bài học</caption>
-            <thead>
-            <tr>
-                <th>Tên bài học</th>
-                <th style="text-align: center;">Nội dung</th>
-            </tr>
-            </thead>
-            {% for l in lessons %}
-            <tbody>
-            <tr>
-                <td>{{ l.title }}</td>
-                <td style="text-align: center"><a href="#" class="btn btn-primary">Xem chi tiết</a></td>
-            </tr>
-            </tbody>
-            {% endfor %}
-        </table>
+    <div class="col-md-8 col-xs-12">
+        <div class="card rounded-3 p-3 bg-light">
+            <div class="card_body">
+                <div>
+                    <h2>Giới thiệu</h2>
+                    <p class="text-justify">Đối với nhiều ngôn ngữ khác trên thế giới, đặc biệt là các ngôn ngữ châu Á sử dụng hệ chữ tượng hình như tiếng Trung hay tiếng Nhật, việc tiếp cận lúc ban đầu có thể tạo ra cảm giác khá xa lạ. Nhưng với tiếng Anh – một ngôn ngữ quốc tế sử dụng hệ chữ cái latinh giống tiếng Việt – chúng ta có một lợi thế rất lớn khi bắt đầu học. Sự quen thuộc về mặt chữ viết giúp người Việt dễ tiếp cận hệ thống âm thanh, cấu trúc câu và cách ghi chép hơn rất nhiều.</p>
+                    <p class="text-justify">Tuy nhiên, tiếng Anh lại là một câu chuyện khác ở phương diện sử dụng thực tế. Mặc dù xuất hiện phổ biến trong môi trường học tập và công việc, đa phần người học tiếng Anh tại Việt Nam vẫn chỉ dừng lại ở mức “học ngữ pháp – làm bài tập”, ít có cơ hội rèn luyện giao tiếp cùng người bản ngữ, thiếu môi trường để áp dụng tiếng Anh trong đời sống thật. Điều này khiến nhiều người dù học nhiều năm nhưng vẫn gặp khó khăn trong việc nghe – nói hoặc phản xạ tự nhiên.</p>
+                    <p class="text-justify">Nhận thấy nhu cầu đó, khóa học tiếng Anh Beginner – học trực tiếp cùng các bạn du học sinh và giảng viên từng sinh sống, làm việc tại các quốc gia nói tiếng Anh – đã được xây dựng. Khóa học được thiết kế để bất cứ ai, dù là học sinh, sinh viên hay người đi làm, dù chưa từng tự tin giao tiếp tiếng Anh, cũng có thể bắt đầu một cách nhẹ nhàng và đúng hướng.</p>
+                    <p class="text-justify">Bạn sẽ được làm quen từ những nền tảng cơ bản nhất: cách phát âm chuẩn theo IPA, các mẫu câu đơn giản dùng trong giao tiếp hàng ngày, từ vựng thiết yếu, kỹ năng nghe thực tế và đặc biệt là cách người bản xứ thực sự giao tiếp trong đời sống. Khóa học không chỉ giúp bạn xây dựng nền tảng vững chắc để tự học tiếng Anh, mà còn tạo môi trường để bạn trải nghiệm tiếng Anh như cách nó được sử dụng trong thực tế – tự nhiên, linh hoạt và đầy cảm hứng.</p>
+                </div>
+
+                <h2>Chọn lớp bạn muốn đăng ký</h2>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Phòng học</th>
+                            <th>Thời khóa biểu</th>
+                            <th>Sĩ số lớp hiện tại</th>
+                            <th>Lựa chọn</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in sections %}
+                        <tr>
+                            <td>{{ s.classroom }}</td>
+                            <td>{{ s.schedule }}</td>
+                            <td>.../{{ s.classroom.capacity }}</td>
+                            <td>
+                                {% if enrollment_existed %}
+                                    {% if enrollment_existed.section_id == s.id %}
+                                        <input type="radio" name="section" value="{{ s.id }}" data-price="{{ s.course.price }}" checked>
+                                    {% else %}
+                                        <input type="radio" name="section" value="{{ s.id }}" data-price="{{ s.course.price }}" disabled>
+                                    {% endif %}
+                                {% else %}
+                                    <input type="radio" name="section" value="{{ s.id }}" data-price="{{ s.course.price }}">
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
     </div>
 
-    <!-- Bảng đăng ký chi tiết -->
-    <div class="col-md-6 col-xs-12">
-        <div class="d-flex flex-column register-panel">
-            <div class="text-center title">{{ course.name }}</div>
-            <img src="{{ url_for('static', filename='images/course.jpg') }}" alt="{{ course.name }}">
-            <div class="price">Giá tiền: {{ course.price }} VND</div>
-            <div class="desc"><b>Mô tả:</b> {{ course.description }}</div>
-            <div class="p-2">
-                <button type="button" class="btn btn-danger btn-lg" data-toggle="modal" data-target="#myFormModal" onclick="classRegisterModal({{ course.id }})">Đăng
-                    ký
-                </button>
-                <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myFormModal" onclick="classRegisterModal({{ course.id }})">
-                    Chọn lớp
-                </button>
+    <div class="col-md-4 col-xs-12">
+        <div class="card rounded-3 p-3 bg-light">
+            <div class="mb-3">
+                <img src="{{ url_for('static', filename='images/course.jpg') }}" alt="{{ course.name }}">
             </div>
+            <div class="mb-3">
+                <h2 class="text-center h3 fw-bold">{{ course.name }}</h2>
+            </div>
+            <div class="mb-3">
+                <span class="fw-semibold h3">Giá tiền: {{ "{:,.0f}".format(course.price) }} VND</span>
+            </div>
+            <div class="mb-3">
+                <div class="fw-5"><b>Mô tả:</b> {{ course.description }}</div>
+            </div>
+            {% if current_user.is_authenticated %}
+                {% if enrollment_existed %}
+                    <div class="mb-3 text-center">
+                        <button type="button" class="btn btn-danger btn-lg" onclick="cancelSection({{ enrollment_existed.id }})">Hủy đăng ký</button>
+                    </div>
+                {% else %}
+                <div class="mb-3 text-center">
+                    <button type="button" class="btn btn-danger btn-lg" onclick="enrollSection()">Đăng ký</button>
+                </div>
+                {% endif %}
+            {% else %}
+                <a href="/login-account">Đăng nhập để đăng ký khóa học này...</a>
+            {% endif %}
         </div>
     </div>
 </div>

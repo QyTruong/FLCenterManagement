@@ -1,13 +1,13 @@
 from flask import render_template, request, jsonify, url_for, session
 from werkzeug.utils import redirect
 from courseapp import app, dao, login
-from flask_login import login_user, logout_user
+from flask_login import login_user, logout_user, current_user
 import cloudinary.uploader
+
 
 
 @app.route('/')
 def index():
-
     return render_template('index.html')
 
 @app.route('/courses')
@@ -18,35 +18,37 @@ def course_list():
 
 @app.route('/courses/<int:course_id>')
 def course_detail(course_id):
-    lessons = dao.get_lessons(course_id)
-    course = dao.get_course_by_id(course_id)
+    lessons = dao.get_lessons(course_id=course_id)
+    course = dao.get_course_by_id(course_id=course_id)
+    sections = dao.get_sections(course_id=course_id)
+    enrollment_existed = dao.get_enrollment_existed(student_id=current_user.id, course_id=course_id)
 
-    return render_template('course_detail.html', lessons=lessons, course=course)
+    return render_template('course_detail.html', lessons=lessons, course=course, sections=sections, enrollment_existed=enrollment_existed)
 
-@app.route('/api/class-list/<int:course_id>', methods=['GET'])
-def class_list(course_id):
-    classes = dao.get_classes(course_id)
+@app.route('/api/enroll-section', methods=['POST'])
+def enroll_section():
+    section_id = request.json.get('section_id')
+    unit_price = request.json.get('price')
 
-    data = []
+    try:
+        dao.add_to_enrollment(current_user.id, section_id, unit_price)
+    except Exception as e:
+        return {'status': "fail", 'message': str(e)}
 
-    for c in classes:
-        schedule_list = []
+    return {'status': 'success', 'message': 'Đăng ký thành công'}
 
-        for s in c.schedules:
-            schedule_list.append({
-                'day_of_week' : s.day_of_week,
-                'start_time' : s.start_time.strftime('%H:%M') if s.start_time else None,
-                'end_time' : s.end_time.strftime('%H:%M') if s.start_time else None
-            })
 
-        data.append({
-            'id': c.id,
-            'name': c.name,
-            'max_student' : c.max_student,
-            'schedules': schedule_list
-        })
+@app.route('/api/cancel-section', methods=['PATCH'])
+def cancel_section():
+    enrollment_id = int(request.json.get('id'))
 
-    return jsonify(data)
+    try:
+        dao.cancel_enrollment(enrollment_id=enrollment_id)
+    except Exception as e:
+        return {'message': str(e)}
+
+    return {'message': 'Hủy đăng ký thành công'}
+
 
 @app.route('/register-account', methods=['GET', 'POST'])
 def register_account():

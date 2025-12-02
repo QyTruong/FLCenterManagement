@@ -7,9 +7,8 @@ from enum import Enum as Type
 from flask_login import UserMixin
 
 class Status(Type):
-    UNREGISTERED = 1
-    REGISTERED = 2
-    PAID = 3
+    REGISTERED = 1
+    CANCELLED = 2
 
 class Result(Type):
     SUCCESS = 1
@@ -22,6 +21,8 @@ class BaseModel(db.Model):
     active = Column(Boolean, default=True)
 
 class User(BaseModel, UserMixin):
+    __tablename__ = 'user'
+
     def __init__(self, username, password, staff=None, student=None, teacher=None):
         self.username = username
         self.password = password
@@ -48,7 +49,8 @@ class User(BaseModel, UserMixin):
 
 class Staff(db.Model):
     __tablename__ = 'staff'
-    id = Column(Integer, ForeignKey('user.id'), primary_key=True, unique=True, nullable=False)
+
+    id = Column(Integer, ForeignKey(User.id), primary_key=True, unique=True, nullable=False)
     name = Column(String(50), nullable=False)
     email = Column(String(50), nullable=False)
     avatar = Column(String(255), nullable=False)
@@ -61,12 +63,13 @@ class Staff(db.Model):
 
 class Student(db.Model):
     __tablename__ = 'student'
-    id = Column(Integer, ForeignKey('user.id'), primary_key=True, unique=True, nullable=False)
+
+    id = Column(Integer, ForeignKey(User.id), primary_key=True, unique=True, nullable=False)
     name = Column(String(50), nullable=False)
     email = Column(String(50), nullable=False)
     avatar = Column(String(255), nullable=True)
 
-    registers = relationship('Register', backref='student', lazy=True)
+    enrollments = relationship('Enrollment', backref='student', lazy=True)
 
     def __str__(self):
         return self.name
@@ -75,30 +78,67 @@ class Student(db.Model):
 class Teacher(db.Model):
     __tablename__ = 'teacher'
 
-    id = Column(Integer, ForeignKey('user.id'), primary_key=True, unique=True, nullable=False)
+    id = Column(Integer, ForeignKey(User.id), primary_key=True, unique=True, nullable=False)
     name = Column(String(50), nullable=False)
     email = Column(String(50), nullable=False)
     avatar = Column(String(255), nullable=False)
     specialization = Column(String(50), nullable=True)
 
-    classes = relationship('Class', backref='teacher', lazy=True)
+    classrooms = relationship('Classroom', backref='teacher', lazy=True)
 
     def __str__(self):
         return self.name
 
-class Course(BaseModel):
-    __tablename__ = 'course'
+class Classroom(BaseModel):
+    __tablename__ = 'classroom'
 
     name = Column(String(50), nullable=False)
-    image = Column(String(100), nullable=True)
-    description = Column(String(255), nullable=True)
-    price = Column(Float, nullable=False)
+    capacity = Column(Integer, nullable=False)
+    teacher_id = Column(Integer, ForeignKey(Teacher.id), nullable=True)
 
-    lessons = relationship('Lesson', backref='course', lazy=True)
-    registers = relationship('Register', backref='course', lazy=True)
+    sections = relationship('Section', backref='classroom', lazy=True)
 
     def __str__(self):
         return self.name
+
+
+class Enrollment(BaseModel):
+    __tablename__ = 'enrollment'
+
+    enroll_date = Column(DateTime, default=datetime.now())
+    status = Column(Enum(Status), nullable=False, default=Status.REGISTERED)
+    unit_price = Column(Float, nullable=False)
+    student_id = Column(Integer, ForeignKey('student.id'), nullable=False)
+    section_id = Column(Integer, ForeignKey('section.id'), nullable=False)
+    invoice_id = Column(Integer, ForeignKey('invoice.id'), nullable=True)
+
+    scores = relationship('Score', backref='enrollment', lazy=True)
+
+class Score(BaseModel):
+    __tablename__ = 'score'
+
+    score = Column(Float, nullable=False)
+    type = Column(String(50), nullable=False)
+    result = Column(Enum(Result), nullable=False)
+    enrollment_id = Column(Integer, ForeignKey(Enrollment.id), nullable=True)
+
+class Invoice(BaseModel):
+    __tablename__ = 'invoice'
+
+    amount = Column(Float, nullable=False)
+    payment_date = Column(DateTime, default=datetime.now())
+    staff_id = Column(Integer, ForeignKey(Staff.id), nullable=False)
+
+    enrollments = relationship('Enrollment', backref='invoice', lazy=True)
+
+class Section(BaseModel):
+    __tablename__ = 'section'
+
+    schedule = Column(String(50), nullable=False)
+    classroom_id = Column(Integer, ForeignKey('classroom.id'), nullable=False)
+    course_id = Column(Integer, ForeignKey('course.id'), nullable=False)
+
+    enrollments = relationship('Enrollment', backref='section', lazy=True)
 
 class Lesson(BaseModel):
     __tablename__ = 'lesson'
@@ -110,62 +150,22 @@ class Lesson(BaseModel):
     def __str__(self):
         return self.title
 
-class Class(BaseModel):
-    __tablename__ = 'class'
+class Course(BaseModel):
+    __tablename__ = 'course'
 
     name = Column(String(50), nullable=False)
+    image = Column(String(100), nullable=True)
+    description = Column(String(255), nullable=True)
     start_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=False)
-    max_student = Column(Integer, default=50, nullable=False)
-    teacher_id = Column(Integer, ForeignKey(Teacher.id), nullable=True)
-    course_id = Column(Integer, ForeignKey(Course.id), nullable=True)
+    price = Column(Float, nullable=False)
 
-    schedules = relationship('Schedule', backref='class', lazy=True)
+    lessons = relationship('Lesson', backref='course', lazy=True)
+    sections = relationship('Section', backref='course', lazy=True)
 
     def __str__(self):
         return self.name
 
-class Schedule(BaseModel):
-    __tablename__ = 'schedule'
-
-    day_of_week = Column(String(15), nullable=False)
-    start_time = Column(Time, nullable=False)
-    end_time = Column(Time, nullable=False)
-    class_id = Column(Integer, ForeignKey(Class.id), nullable=False)
-
-    def __str__(self):
-        return f"{self.day_of_week}   {self.start_time} - {self.end_time}"
-
-
-class Register(BaseModel):
-    __tablename__ = 'register'
-
-    student_id = Column(Integer, ForeignKey(Student.id), nullable=False)
-    course_id = Column(Integer, ForeignKey(Course.id), nullable=False)
-    register_date = Column(DateTime, default=datetime.now())
-    unit_price = Column(Float, nullable=True)
-    status = Column(Enum(Status), nullable=False, default=Status.UNREGISTERED)
-    invoice_id = Column(Integer, ForeignKey('invoice.id'), nullable=True)
-
-    scores = relationship('Score', backref='register', lazy=True)
-
-class Invoice(BaseModel):
-    __tablename__ = 'invoice'
-
-    amount = Column(Float, nullable=False)
-    payment_date = Column(DateTime, default=datetime.now())
-    staff_id = Column(Integer, ForeignKey(Staff.id), nullable=False)
-
-    registers = relationship(Register, backref='invoice', lazy=True)
-
-
-class Score(BaseModel):
-    __tablename__ = 'score'
-
-    score = Column(Float, nullable=False)
-    type = Column(String(50), nullable=False)
-    result = Column(Enum(Result), nullable=False)
-    register_id = Column(Integer, ForeignKey(Register.id), unique=True)
 
 if __name__ == '__main__':
     with app.app_context():
@@ -188,21 +188,22 @@ if __name__ == '__main__':
                 db.session.add(l)
             db.session.commit()
 
-        # Class
-        with open('data/classes.json', 'r', encoding='utf-8') as f:
+        # Classroom
+        with open('data/classrooms.json', 'r', encoding='utf-8') as f:
             data = json.load(f)
             for cls in data:
-                c = Class(**cls)
+                c = Classroom(**cls)
                 db.session.add(c)
             db.session.commit()
 
-        # Schedule
-        with open('data/schedules.json', 'r', encoding='utf-8') as f:
+        # section
+        with open('data/sections.json', 'r', encoding='utf-8') as f:
             data = json.load(f)
-            for sc in data:
-                s = Schedule(**sc)
+            for se in data:
+                s = Section(**se)
                 db.session.add(s)
             db.session.commit()
+
 
         #User
         with open('data/users.json', 'r', encoding='utf-8') as f:

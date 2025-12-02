@@ -1,0 +1,21 @@
+[{
+  "name" : "A1",
+  "capacity" : 20,
+  "teacher_id" : null
+}, {
+  "name" : "A2",
+  "capacity" : 20,
+  "teacher_id" : null
+}, {
+  "name" : "A3",
+  "capacity" : 20,
+  "teacher_id" : null
+}, {
+  "name" : "A4",
+  "capacity" : 20,
+  "teacher_id" : null
+}, {
+  "name" : "A5",
+  "capacity" : 20,
+  "teacher_id" : null
+}]

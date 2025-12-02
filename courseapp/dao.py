@@ -1,4 +1,4 @@
-from models import Course, Lesson, Class, Schedule, User, Student, Teacher, Staff
+from models import Course, Lesson, Classroom, User, Student, Teacher, Staff, Section, Enrollment, Status
 import hashlib
 from courseapp import db
 
@@ -16,19 +16,11 @@ def get_lessons(course_id):
 
     return query.all()
 
-def get_classes(course_id):
-    query = Class.query.filter(Class.active.__eq__(True))
+def get_sections(course_id):
+    query = Section.query.filter(Section.active.__eq__(True))
 
     if course_id:
-        query = query.filter(Class.course_id.__eq__(course_id))
-
-    return query.all()
-
-def get_schedules(class_id):
-    query = Schedule.query.filter(Schedule.active.__eq__(True))
-
-    if class_id:
-        query = query.filter(Schedule.class_id.__eq__(class_id))
+        query = query.filter(Section.course_id.__eq__(course_id))
 
     return query.all()
 
@@ -54,3 +46,28 @@ def add_user(name, username, password, email, avatar=None):
     db.session.add(user)
     db.session.add(student)
     db.session.commit()
+
+def add_to_enrollment(student_id, section_id, unit_price):
+    enrollment = Enrollment(student_id=student_id, section_id=section_id, unit_price=unit_price)
+    db.session.add(enrollment)
+    db.session.commit()
+
+def cancel_enrollment(enrollment_id):
+    e = Enrollment.query.filter(Enrollment.id.__eq__(enrollment_id)).first()
+
+    if e:
+        e.status = Status.CANCELLED
+        print(e.status)
+        db.session.commit()
+
+
+def get_enrollment_existed(student_id, course_id):
+    query = Enrollment.query.filter(Enrollment.status.__eq__(Status.REGISTERED))\
+                    .filter(Enrollment.student_id.__eq__(student_id)).all()
+
+    for q in query:
+        if q.section.course_id == course_id:
+            return q
+
+    return None
+

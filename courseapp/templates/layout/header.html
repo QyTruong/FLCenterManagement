@@ -17,7 +17,7 @@
                 </li>
                 {% if current_user.is_authenticated %}
                 <li class="nav-item">
-                    <img src="{{ current_user.role.avatar }}" alt="{{ current_user.name }}">
+                    <img src="{{ current_user.role.avatar }}" alt="{{ current_user.role.name }}">
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('logout_account') }}">Đăng xuất</a>
