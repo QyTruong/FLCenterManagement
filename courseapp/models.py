@@ -137,6 +137,7 @@ class Section(BaseModel):
     schedule = Column(String(50), nullable=False)
     classroom_id = Column(Integer, ForeignKey('classroom.id'), nullable=False)
     course_id = Column(Integer, ForeignKey('course.id'), nullable=False)
+    current_size = Column(Integer, default=0)
 
     enrollments = relationship('Enrollment', backref='section', lazy=True)
 

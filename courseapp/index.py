@@ -21,7 +21,7 @@ def course_detail(course_id):
     lessons = dao.get_lessons(course_id=course_id)
     course = dao.get_course_by_id(course_id=course_id)
     sections = dao.get_sections(course_id=course_id)
-    enrollment_existed = dao.get_enrollment_existed(student_id=current_user.id, course_id=course_id)
+    enrollment_existed = dao.get_enrollment_existed(course_id=course_id)
 
     return render_template('course_detail.html', lessons=lessons, course=course, sections=sections, enrollment_existed=enrollment_existed)
 
@@ -29,13 +29,21 @@ def course_detail(course_id):
 def enroll_section():
     section_id = request.json.get('section_id')
     unit_price = request.json.get('price')
+    schedule = request.json.get('schedule')
 
     try:
-        dao.add_to_enrollment(current_user.id, section_id, unit_price)
-    except Exception as e:
-        return {'status': "fail", 'message': str(e)}
+        schedule_existed = dao.check_schedule_existed(schedule)
+        if not schedule_existed:
+            check_enroll = dao.add_to_enrollment(section_id=section_id, unit_price=unit_price)
+            if not check_enroll:
+                return {'message': 'Lớp học đã đủ số lượng học viên, vui lòng đăng ký lớp khác'}
+        else:
+            return {'message': f'Phiên học {schedule_existed} đã được đăng ký, vui lòng đăng phiên học khác'}
 
-    return {'status': 'success', 'message': 'Đăng ký thành công'}
+    except Exception as e:
+        return {'message': str(e)}
+
+    return {'message': 'Đăng ký thành công'}
 
 
 @app.route('/api/cancel-section', methods=['PATCH'])
@@ -77,21 +85,26 @@ def register_account():
 
     return render_template('account_register.html', err_msg=err_msg)
 
-@app.route('/login-account', methods=['GET', 'POST'])
+@app.route('/login-account')
+def login_view():
+    return render_template('account_login.html')
+
+@app.route('/login-account', methods=['POST'])
 def login_account():
     err_msg = ''
 
-    if request.method.__eq__('POST'):
-        username = request.form.get('username')
-        password = request.form.get('password')
+    username = request.form.get('username')
+    password = request.form.get('password')
 
-        user = dao.auth_user(username=username, password=password)
+    user = dao.auth_user(username=username, password=password)
 
-        if user:
-            login_user(user=user)
-            return redirect(url_for('index'))
-        else:
-            err_msg = 'Tài khoản hoặc mật khẩu không đúng'
+    if user:
+        login_user(user=user)
+        next = request.args.get('next')
+        print(next)
+        return redirect(next if next else '/')
+    else:
+        err_msg = 'Tài khoản hoặc mật khẩu không đúng'
 
     return render_template('account_login.html', err_msg=err_msg)
 

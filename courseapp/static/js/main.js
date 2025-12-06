@@ -10,7 +10,8 @@ function enrollSection(){
         method: "POST",
         body: JSON.stringify({
             "section_id" : selected.value,
-            "price" : selected.dataset.price
+            "price" : selected.dataset.price,
+            "schedule" : selected.dataset.schedule
         }),
         headers: {
             "Content-Type" : "application/json"

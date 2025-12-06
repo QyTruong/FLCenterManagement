@@ -1,6 +1,7 @@
 from models import Course, Lesson, Classroom, User, Student, Teacher, Staff, Section, Enrollment, Status
 import hashlib
 from courseapp import db
+from flask_login import current_user
 
 def get_courses():
     return Course.query.all()
@@ -47,27 +48,59 @@ def add_user(name, username, password, email, avatar=None):
     db.session.add(student)
     db.session.commit()
 
-def add_to_enrollment(student_id, section_id, unit_price):
-    enrollment = Enrollment(student_id=student_id, section_id=section_id, unit_price=unit_price)
-    db.session.add(enrollment)
-    db.session.commit()
+def check_schedule_existed(schedule):
+    query = db.session.query(Section) \
+        .join(Enrollment, Enrollment.section_id.__eq__(Section.id)) \
+        .filter(
+        Enrollment.status == Status.REGISTERED,
+        Enrollment.student_id == current_user.id,
+        Section.schedule == schedule
+    )
+
+    schedule_existed = query.first()
+    if schedule_existed:
+        return schedule_existed.schedule
+
+    return None
+
+def add_to_enrollment(section_id, unit_price):
+    section = Section.query.filter(Section.id.__eq__(section_id)).first()
+    classroom = Classroom.query.filter(Classroom.id.__eq__(section.classroom_id)).first()
+
+    if section.current_size < classroom.capacity:
+        enrollment = Enrollment(student_id=current_user.id, section_id=section_id, unit_price=unit_price)
+        db.session.add(enrollment)
+        section.current_size += 1
+        db.session.commit()
+
+        return True
+
+    return False
+
 
 def cancel_enrollment(enrollment_id):
-    e = Enrollment.query.filter(Enrollment.id.__eq__(enrollment_id)).first()
+    enrollment = Enrollment.query.filter(Enrollment.id.__eq__(enrollment_id)).first()
+    section = Section.query.filter(Section.id.__eq__(enrollment.section_id)).first()
 
-    if e:
-        e.status = Status.CANCELLED
-        print(e.status)
+    if section.current_size > 0 and enrollment:
+        enrollment.status = Status.CANCELLED
+        section.current_size -= 1
         db.session.commit()
 
 
-def get_enrollment_existed(student_id, course_id):
-    query = Enrollment.query.filter(Enrollment.status.__eq__(Status.REGISTERED))\
-                    .filter(Enrollment.student_id.__eq__(student_id)).all()
 
-    for q in query:
-        if q.section.course_id == course_id:
-            return q
+def get_enrollment_existed(course_id):
+    if current_user.is_authenticated:
+        query = db.session.query(Enrollment) \
+            .join(Section, Section.id == Enrollment.section_id) \
+            .filter(
+            Enrollment.student_id.__eq__(current_user.id),
+            Section.course_id.__eq__(course_id),
+            Enrollment.status.__eq__(Status.REGISTERED)
+        ).first()
+
+        return query
 
     return None
+
 
