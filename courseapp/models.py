@@ -170,70 +170,97 @@ class Course(BaseModel):
 
 if __name__ == '__main__':
     with app.app_context():
-        db.drop_all()
+        # db.drop_all()
         db.create_all()
 
-        # Course
-        with open('data/courses.json', 'r', encoding='utf-8') as f:
+        # import hashlib
+        #
+        # u = User(username='admin4', password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()))
+        # db.session.add(u)
+        # db.session.commit()
+        #
+        # s = Staff(id=u.id, name='Staff4', email='staff4@gmail.com',
+        #           avatar='https://res.cloudinary.com/dl0b32hii/image/upload/v1763480359/ksw7wx53ma3edyfrqh8q.jpg')
+        # db.session.add(s)
+        # db.session.commit()
+
+        # Enrollment
+        with open('data/enrollments.json', 'r', encoding='utf-8') as f:
             data = json.load(f)
-            for course in data:
-                c = Course(**course)
+            for en in data:
+                c = Enrollment(**en)
                 db.session.add(c)
             db.session.commit()
 
-        # Lesson
-        with open('data/lessons.json', 'r', encoding='utf-8') as f:
-            data = json.load(f)
-            for course in data:
-                l = Lesson(**course)
-                db.session.add(l)
-            db.session.commit()
+        # # Invoice
+        # with open('data/invoices.json', 'r', encoding='utf-8') as f:
+        #     data = json.load(f)
+        #     for inv in data:
+        #         c = Invoice(**inv)
+        #         db.session.add(c)
+        #     db.session.commit()
 
-        # Classroom
-        with open('data/classrooms.json', 'r', encoding='utf-8') as f:
-            data = json.load(f)
-            for cls in data:
-                c = Classroom(**cls)
-                db.session.add(c)
-            db.session.commit()
-
-        # section
-        with open('data/sections.json', 'r', encoding='utf-8') as f:
-            data = json.load(f)
-            for se in data:
-                s = Section(**se)
-                db.session.add(s)
-            db.session.commit()
-
-
-        #User
-        with open('data/users.json', 'r', encoding='utf-8') as f:
-            data = json.load(f)
-            for us in data:
-                u = User(**us)
-                db.session.add(u)
-            db.session.commit()
-
-        # Admin
-        with open('data/staff.json', 'r', encoding='utf-8') as f:
-            data = json.load(f)
-            for ad in data:
-                a = Staff(**ad)
-                db.session.add(a)
-            db.session.commit()
-
-        #Student
-        with open('data/students.json', 'r', encoding='utf-8') as f:
-            data = json.load(f)
-            for st in data:
-                s = Student(**st)
-                db.session.add(s)
-            db.session.commit()
-
-        # Teacher
-        with open('data/teachers.json', 'r', encoding='utf-8') as f:
-            data = json.load(f)
-            for te in data:
-                t = Teacher(**te)
-                db.session.add(t)
-            db.session.commit()
+        # # Course
+        # with open('data/courses.json', 'r', encoding='utf-8') as f:
+        #     data = json.load(f)
+        #     for course in data:
+        #         c = Course(**course)
+        #         db.session.add(c)
+        #     db.session.commit()
+        #
+        # # Lesson
+        # with open('data/lessons.json', 'r', encoding='utf-8') as f:
+        #     data = json.load(f)
+        #     for course in data:
+        #         l = Lesson(**course)
+        #         db.session.add(l)
+        #     db.session.commit()
+        #
+        # # Classroom
+        # with open('data/classrooms.json', 'r', encoding='utf-8') as f:
+        #     data = json.load(f)
+        #     for cls in data:
+        #         c = Classroom(**cls)
+        #         db.session.add(c)
+        #     db.session.commit()
+        #
+        # # section
+        # with open('data/sections.json', 'r', encoding='utf-8') as f:
+        #     data = json.load(f)
+        #     for se in data:
+        #         s = Section(**se)
+        #         db.session.add(s)
+        #     db.session.commit()
+        #
+        #
+        # #User
+        # with open('data/users.json', 'r', encoding='utf-8') as f:
+        #     data = json.load(f)
+        #     for us in data:
+        #         u = User(**us)
+        #         db.session.add(u)
+        #     db.session.commit()
+        #
+        # # Admin
+        # with open('data/staff.json', 'r', encoding='utf-8') as f:
+        #     data = json.load(f)
+        #     for ad in data:
+        #         a = Staff(**ad)
+        #         db.session.add(a)
+        #     db.session.commit()
+        #
+        # #Student
+        # with open('data/students.json', 'r', encoding='utf-8') as f:
+        #     data = json.load(f)
+        #     for st in data:
+        #         s = Student(**st)
+        #         db.session.add(s)
+        #     db.session.commit()
+        #
+        # # Teacher
+        # with open('data/teachers.json', 'r', encoding='utf-8') as f:
+        #     data = json.load(f)
+        #     for te in data:
+        #         t = Teacher(**te)
+        #         db.session.add(t)
+        #     db.session.commit()

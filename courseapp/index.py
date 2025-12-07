@@ -102,7 +102,12 @@ def login_account():
         login_user(user=user)
         next = request.args.get('next')
         print(next)
+
+        if user.staff:
+           return redirect('/admin')
+
         return redirect(next if next else '/')
+
     else:
         err_msg = 'Tài khoản hoặc mật khẩu không đúng'
 

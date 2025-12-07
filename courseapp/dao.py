@@ -1,7 +1,10 @@
-from models import Course, Lesson, Classroom, User, Student, Teacher, Staff, Section, Enrollment, Status
+from models import Course, Lesson, Classroom, User, Student, Teacher, Staff, Section, Enrollment, Status, Invoice, Score, Result
 import hashlib
 from courseapp import db
 from flask_login import current_user
+from sqlalchemy import func, case
+from sqlalchemy.sql import extract
+
 
 def get_courses():
     return Course.query.all()
@@ -103,4 +106,55 @@ def get_enrollment_existed(course_id):
 
     return None
 
+#------THÔNG KÊ---------
+
+def course_stats():
+    return db.session.query(Course.id, Course.name, func.count(Lesson.id))\
+        .join(Lesson, Course.id.__eq__(Lesson.course_id))\
+        .group_by(Course.id, Course.name).all()
+
+
+def number_of_student_stats(kw=None, from_date=None, to_date=None):
+    q = db.session.query(Course.id, Course.name, func.count(Enrollment.id))\
+        .join(Section, Course.id.__eq__(Section.course_id), isouter=True)\
+        .join(Enrollment, Section.id.__eq__(Enrollment.section_id),isouter=True)\
+        .group_by(Course.id, Course.name)
+
+    if kw:
+        q = q.filter(Course.name.contains(kw))
+
+    if from_date:
+        q = q.filter(Enrollment.enroll_date.__ge__(from_date))
+
+    if to_date:
+        q = q.filter(Enrollment.enroll_date.__le__(to_date))
+
+    return q.all()
+
+
+def revenue_by_month_stats(year):
+
+    return db.session.query(extract('month', Invoice.payment_date), func.sum(Invoice.amount))\
+        .filter(extract('year', Invoice.payment_date) == year)\
+        .group_by(extract('month', Invoice.payment_date))\
+        .order_by(extract('month', Invoice.payment_date)).all()
+
+
+def pass_rate_stats(from_date=None, to_date=None):
+
+    q= db.session.query(Course.name, func.count(Score.id),
+                        func.sum(case((Score.result.__eq__(Result.SUCCESS),1), else_=0)),
+                        (func.sum(case((Score.result.__eq__(Result.SUCCESS),1), else_=0))*100 / func.count(Score.id)))\
+                        .join(Section, Section.course_id.__eq__(Course.id), isouter=True)\
+                        .join(Enrollment, Enrollment.section_id.__eq__(Section.id), isouter=True)\
+                        .join(Score, Score.enrollment_id.__eq__(Enrollment.id), isouter=True)\
+                        .group_by(Course.name)
+
+    if from_date:
+        q = q.filter(Enrollment.enroll_date.__ge__(from_date))
+
+    if to_date:
+        q = q.filter(Enrollment.enroll_date.__le__(to_date))
+
+    return q.all()
 
