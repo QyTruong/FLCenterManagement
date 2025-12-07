@@ -1,0 +1,85 @@
+{% extends 'admin/master.html' %}
+{% block body %}
+{{ super() }}
+{% if current_user.is_authenticated and current_user.staff%}
+<h1 class="text-center text-danger">THỐNG KÊ DOANH THU</h1>
+
+<div class="row pt-3 pl-2">
+    <div class="col-md-5 col-xs-12">
+       <table class="table table-bordered">
+            <tr class="table-secondary">
+                <th>Tháng</th>
+                <th>Doanh thu</th>
+            </tr>
+            {% for s in revenue_stats %}
+            <tr>
+                <td>{{ s[0] }}</td>
+                <td>{{ "{:,.0f}".format(s[1]).replace(",",".") }} VND</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="col-md-7 col-xs-12">
+         <form class="pb-2">
+            <div class="form-group" style="width:600px;">
+                <input type="number" min="2020" class="form-control" name="year" placeholder="Nhập năm...">
+            </div>
+            <input type="submit" value="Thống kê" class="btn btn-success">
+        </form>
+        <div style="height: 250px; width: 600px;">
+            <canvas id="revenueStatsChart">
+            </canvas>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    let labels = []
+    let data = []
+    let colors = []
+    let borderColor = []
+    let r ,g, b
+
+    {% for s in revenue_stats %}
+
+    labels.push('{{ s[0] }}')
+    data.push({{ s[1] }})
+    r = Math.random()*255
+    g = Math.random()*255
+    b = Math.random()*255
+    colors.push(`rgba(${r}, ${g}, ${b}, 0.3)`)
+    borderColor.push(`rgba(${r}, ${g}, ${b}, 1)`)
+
+    {% endfor %}
+
+    window.onload = function(){
+    const ctx = document.getElementById('revenueStatsChart').getContext('2d');
+
+    loadChart(ctx, labels, data,'line', colors, borderColor)
+    }
+
+function loadChart(ctx,labels, data, type, colors, borderColor){
+     const myChart = new Chart(ctx, {
+        type: type,
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Thống kê doanh thu',
+            data: data,
+            backgroundColor: colors,
+            borderColor: borderColor,
+            borderWidth: 1
+          }]
+        },
+        options: {
+        responsive: true,
+        maintainAspectRatio: false
+        }
+     });
+}
+</script>
+{% endif %}
+
+{% endblock%}

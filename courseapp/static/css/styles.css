@@ -61,3 +61,21 @@ table caption {
     font-size: 25px;
 }
 
+.center-box {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+}
+
+.stat-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.card-icon {
+    font-size: 20px;
+    padding-bottom: 2px;
+    padding-left: 5px;
+}
