@@ -1,5 +1,5 @@
 # FLCenterManagement
-Foreign Language Center Management System - Flask project - CNPM
+Foreign Language Center Management System - Flask project - Công nghệ phần mềm
 
 Members:
 - Phạm Quý Trưởng
