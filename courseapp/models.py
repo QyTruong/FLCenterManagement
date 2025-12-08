@@ -170,27 +170,35 @@ class Course(BaseModel):
 
 if __name__ == '__main__':
     with app.app_context():
-        # db.drop_all()
+        db.drop_all()
         db.create_all()
 
-        # import hashlib
-        #
-        # u = User(username='admin4', password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()))
-        # db.session.add(u)
-        # db.session.commit()
-        #
-        # s = Staff(id=u.id, name='Staff4', email='staff4@gmail.com',
-        #           avatar='https://res.cloudinary.com/dl0b32hii/image/upload/v1763480359/ksw7wx53ma3edyfrqh8q.jpg')
-        # db.session.add(s)
-        # db.session.commit()
+        import hashlib
 
-        # Enrollment
-        with open('data/enrollments.json', 'r', encoding='utf-8') as f:
-            data = json.load(f)
-            for en in data:
-                c = Enrollment(**en)
-                db.session.add(c)
-            db.session.commit()
+        s = Staff(name='Staff4', email='staff4@gmail.com',
+                  avatar='https://res.cloudinary.com/dl0b32hii/image/upload/v1763480359/ksw7wx53ma3edyfrqh8q.jpg')
+
+        student1 = Student(name='student1', email='truong.4725212@gmail.com',
+                  avatar='https://res.cloudinary.com/dl0b32hii/image/upload/v1763480359/ksw7wx53ma3edyfrqh8q.jpg')
+        student2 = Student(name='student2', email='truong.4725212@gmail.com',
+                           avatar='https://res.cloudinary.com/dl0b32hii/image/upload/v1763480359/ksw7wx53ma3edyfrqh8q.jpg')
+        student3 = Student(name='student3', email='truong.4725212@gmail.com',
+                           avatar='https://res.cloudinary.com/dl0b32hii/image/upload/v1763480359/ksw7wx53ma3edyfrqh8q.jpg')
+
+        u1 = User(username='admin4', password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()), staff=s)
+        u2 = User(username='student1', password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()), student=student1)
+        u3 = User(username='student2', password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()), student=student2)
+        u4 = User(username='student3', password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()), student=student3)
+
+        db.session.add_all([u1, u2, u3, u4])
+
+        db.session.add(s)
+        db.session.add(student1)
+        db.session.add(student2)
+        db.session.add(student3)
+
+        db.session.commit()
+
 
         # # Invoice
         # with open('data/invoices.json', 'r', encoding='utf-8') as f:
@@ -200,39 +208,46 @@ if __name__ == '__main__':
         #         db.session.add(c)
         #     db.session.commit()
 
-        # # Course
-        # with open('data/courses.json', 'r', encoding='utf-8') as f:
-        #     data = json.load(f)
-        #     for course in data:
-        #         c = Course(**course)
-        #         db.session.add(c)
-        #     db.session.commit()
-        #
-        # # Lesson
-        # with open('data/lessons.json', 'r', encoding='utf-8') as f:
-        #     data = json.load(f)
-        #     for course in data:
-        #         l = Lesson(**course)
-        #         db.session.add(l)
-        #     db.session.commit()
-        #
-        # # Classroom
-        # with open('data/classrooms.json', 'r', encoding='utf-8') as f:
-        #     data = json.load(f)
-        #     for cls in data:
-        #         c = Classroom(**cls)
-        #         db.session.add(c)
-        #     db.session.commit()
-        #
-        # # section
-        # with open('data/sections.json', 'r', encoding='utf-8') as f:
-        #     data = json.load(f)
-        #     for se in data:
-        #         s = Section(**se)
-        #         db.session.add(s)
-        #     db.session.commit()
-        #
-        #
+        # Course
+        with open('data/courses.json', 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            for course in data:
+                c = Course(**course)
+                db.session.add(c)
+            db.session.commit()
+
+        # Lesson
+        with open('data/lessons.json', 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            for course in data:
+                l = Lesson(**course)
+                db.session.add(l)
+            db.session.commit()
+
+        # Classroom
+        with open('data/classrooms.json', 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            for cls in data:
+                c = Classroom(**cls)
+                db.session.add(c)
+            db.session.commit()
+
+        # section
+        with open('data/sections.json', 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            for se in data:
+                s = Section(**se)
+                db.session.add(s)
+            db.session.commit()
+
+        # Enrollment
+        with open('data/enrollments.json', 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            for en in data:
+                c = Enrollment(**en)
+                db.session.add(c)
+            db.session.commit()
+
         # #User
         # with open('data/users.json', 'r', encoding='utf-8') as f:
         #     data = json.load(f)

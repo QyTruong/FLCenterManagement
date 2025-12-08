@@ -37,12 +37,24 @@
                             <td>
                                 {% if enrollment_existed %}
                                     {% if enrollment_existed.section_id == s.id %}
-                                        <input type="radio" name="section" value="{{ s.id }}" data-price="{{ s.course.price }}" data-schedule="{{ s.schedule }}" checked>
+                                        <input type="radio" name="section" value="{{ s.id }}"
+                                               data-price="{{ s.course.price }}"
+                                               data-schedule="{{ s.schedule }}"
+                                               data-classroom_name="{{ s.classroom.name }}"
+                                               data-course_name="{{ s.course.name }}" checked>
                                     {% else %}
-                                        <input type="radio" name="section" value="{{ s.id }}" data-price="{{ s.course.price }}" data-schedule="{{ s.schedule }}" disabled>
+                                        <input type="radio" name="section" value="{{ s.id }}"
+                                               data-price="{{ s.course.price }}"
+                                               data-schedule="{{ s.schedule }}"
+                                               data-classroom_name="{{ s.classroom.name }}"
+                                               data-course_name="{{ s.course.name }}" disabled>
                                     {% endif %}
                                 {% else %}
-                                    <input type="radio" name="section" value="{{ s.id }}" data-price="{{ s.course.price }}" data-schedule="{{ s.schedule }}">
+                                    <input type="radio" name="section" value="{{ s.id }}"
+                                           data-price="{{ s.course.price }}"
+                                           data-schedule="{{ s.schedule }}"
+                                           data-classroom_name="{{ s.classroom.name }}"
+                                           data-course_name="{{ s.course.name }}">
                                 {% endif %}
                             </td>
                         </tr>

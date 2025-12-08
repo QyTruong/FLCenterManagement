@@ -11,7 +11,9 @@ function enrollSection(){
         body: JSON.stringify({
             "section_id" : selected.value,
             "price" : selected.dataset.price,
-            "schedule" : selected.dataset.schedule
+            "schedule" : selected.dataset.schedule,
+            "classroom_name" : selected.dataset.classroom_name,
+            "course_name" : selected.dataset.course_name
         }),
         headers: {
             "Content-Type" : "application/json"

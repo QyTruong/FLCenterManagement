@@ -16,9 +16,18 @@
                     <a class="nav-link" href="#">Giới thiệu</a>
                 </li>
                 {% if current_user.is_authenticated %}
-                <li class="nav-item">
-                    <img src="{{ current_user.role.avatar }}" alt="{{ current_user.role.name }}">
-                </li>
+                    {% if current_user.role.avatar %}
+                    <li class="nav-item">
+                        <img src="{{ current_user.role.avatar }}" alt="{{ current_user.role.name }}" class="rounded-circle" width="40" height="40" style="object-fit: cover;">
+                        <span class="ml-2 text-white">{{ current_user.role.name }}</span>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <img src="{{ url_for('static', filename='images/default_avatar.jpg') }}" alt="{{ current_user.role.name }}" class="rounded-circle" width="40" height="40" style="object-fit: cover;">
+                        <span class="ml-2 text-white">{{ current_user.role.name }}</span>
+                    </li>
+                    {% endif %}
+
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('logout_account') }}">Đăng xuất</a>
                 </li>

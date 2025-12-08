@@ -1,6 +1,6 @@
 from flask import render_template, request, jsonify, url_for, session
 from werkzeug.utils import redirect
-from courseapp import app, dao, login
+from courseapp import app, dao, login, utils
 from flask_login import login_user, logout_user, current_user
 import cloudinary.uploader
 
@@ -30,6 +30,8 @@ def enroll_section():
     section_id = request.json.get('section_id')
     unit_price = request.json.get('price')
     schedule = request.json.get('schedule')
+    classroom_name = request.json.get('classroom_name')
+    course_name = request.json.get('course_name')
 
     try:
         schedule_existed = dao.check_schedule_existed(schedule)
@@ -37,6 +39,8 @@ def enroll_section():
             check_enroll = dao.add_to_enrollment(section_id=section_id, unit_price=unit_price)
             if not check_enroll:
                 return {'message': 'Lớp học đã đủ số lượng học viên, vui lòng đăng ký lớp khác'}
+            else:
+                utils.send_email_enrollment(course_name=course_name, classroom_name=classroom_name, schedule=schedule, unit_price=unit_price)
         else:
             return {'message': f'Phiên học {schedule_existed} đã được đăng ký, vui lòng đăng phiên học khác'}
 
@@ -81,7 +85,7 @@ def register_account():
             else:
                 err_msg = 'Mật khẩu xác nhận không khớp !!!'
         except Exception as ex:
-            err_msg = 'Hệ thống đang gặp lỗi' + str(ex) + '!!!'
+            err_msg = 'Hệ thống đang gặp lỗi: ' + str(ex)
 
     return render_template('account_register.html', err_msg=err_msg)
 
