@@ -1,5 +1,5 @@
 from sqlalchemy.exc import IntegrityError
-from models import Course, Lesson, Classroom, User, Student, Teacher, Staff, Section, Enrollment, Invoice, Score, Result, Status
+from models import Course, Lesson, Classroom, User, Student, Teacher, Staff, Section, Enrollment, Invoice, Score, Result, EnrollStatus
 import hashlib
 from courseapp import db
 from flask_login import current_user
@@ -59,9 +59,9 @@ def check_schedule_existed(schedule):
     query = db.session.query(Section) \
         .join(Enrollment, Enrollment.section_id.__eq__(Section.id)) \
         .filter(
-        Enrollment.status == Status.REGISTERED,
-        Enrollment.student_id == current_user.id,
-        Section.schedule == schedule
+        Enrollment.status.__eq__(EnrollStatus.REGISTERED),
+        Enrollment.student_id.__eq__(current_user.id),
+        Section.schedule.__eq__(schedule)
     )
 
     schedule_existed = query.first()
@@ -73,10 +73,25 @@ def check_schedule_existed(schedule):
 def add_to_enrollment(section_id, unit_price):
     section = Section.query.filter(Section.id.__eq__(section_id)).first()
     classroom = Classroom.query.filter(Classroom.id.__eq__(section.classroom_id)).first()
+    enrollment_cancelled_existing = Enrollment.query.filter(
+        Enrollment.status.__eq__(EnrollStatus.CANCELLED),
+        Enrollment.student_id.__eq__(current_user.id),
+        Enrollment.section_id.__eq__(section_id)
+    ).first()
 
     if section.current_size < classroom.capacity:
-        enrollment = Enrollment(student_id=current_user.id, section_id=section_id, unit_price=unit_price)
-        db.session.add(enrollment)
+        if enrollment_cancelled_existing:
+            enrollment_cancelled_existing.status = EnrollStatus.REGISTERED
+            invoice_unactive_existing = Invoice.query.filter(
+                Invoice.id.__eq__(enrollment_cancelled_existing.id)
+            ).first()
+            invoice_unactive_existing.active = True
+        else:
+            invoice = Invoice(amount=unit_price)
+            enrollment = Enrollment(student_id=current_user.id, section_id=section_id, unit_price=unit_price, invoice=invoice)
+            db.session.add(enrollment)
+            db.session.add(invoice)
+
         section.current_size += 1
         db.session.commit()
 
@@ -90,7 +105,11 @@ def cancel_enrollment(enrollment_id):
     section = Section.query.filter(Section.id.__eq__(enrollment.section_id)).first()
 
     if section.current_size > 0 and enrollment:
-        enrollment.status = Status.CANCELLED
+        enrollment.status = EnrollStatus.CANCELLED
+        invoice_active_existing = Invoice.query.filter(
+            Invoice.id.__eq__(enrollment.id)
+        ).first()
+        invoice_active_existing.active = False
         section.current_size -= 1
         db.session.commit()
 
@@ -101,12 +120,14 @@ def get_enrollment_existed(course_id):
             .filter(
             Enrollment.student_id.__eq__(current_user.id),
             Section.course_id.__eq__(course_id),
-            Enrollment.status.__eq__(Status.REGISTERED)
+            Enrollment.status.__eq__(EnrollStatus.REGISTERED)
         ).first()
 
         return query
 
     return None
+
+
 
 #------THÔNG KÊ---------
 

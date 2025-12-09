@@ -6,9 +6,13 @@ from datetime import datetime
 from enum import Enum as Type
 from flask_login import UserMixin
 
-class Status(Type):
+class EnrollStatus(Type):
     REGISTERED = 1
     CANCELLED = 2
+
+class PaymentStatus(Type):
+    PENDING = 1
+    PAID = 2
 
 class Result(Type):
     SUCCESS = 1
@@ -106,12 +110,12 @@ class Enrollment(BaseModel):
     __tablename__ = 'enrollment'
 
     enroll_date = Column(DateTime, default=datetime.now())
-    status = Column(Enum(Status), nullable=False, default=Status.REGISTERED)
+    status = Column(Enum(EnrollStatus), nullable=False, default=EnrollStatus.REGISTERED)
     unit_price = Column(Float, nullable=False)
     student_id = Column(Integer, ForeignKey('student.id'), nullable=False)
     section_id = Column(Integer, ForeignKey('section.id'), nullable=False)
-    invoice_id = Column(Integer, ForeignKey('invoice.id'), nullable=True)
 
+    invoice = relationship('Invoice', backref='enrollment', lazy=True, uselist=False)
     scores = relationship('Score', backref='enrollment', lazy=True)
 
 class Score(BaseModel):
@@ -125,11 +129,11 @@ class Score(BaseModel):
 class Invoice(BaseModel):
     __tablename__ = 'invoice'
 
+    id = Column(Integer, ForeignKey(Enrollment.id), primary_key=True, unique=True, nullable=False)
     amount = Column(Float, nullable=False)
-    payment_date = Column(DateTime, default=datetime.now())
-    staff_id = Column(Integer, ForeignKey(Staff.id), nullable=False)
-
-    enrollments = relationship('Enrollment', backref='invoice', lazy=True)
+    payment_date = Column(DateTime)
+    payment_status = Column(Enum(PaymentStatus), default=PaymentStatus.PENDING)
+    staff_id = Column(Integer, ForeignKey(Staff.id), nullable=True)
 
 class Section(BaseModel):
     __tablename__ = 'section'
@@ -185,10 +189,10 @@ if __name__ == '__main__':
         student3 = Student(name='student3', email='truong.4725212@gmail.com',
                            avatar='https://res.cloudinary.com/dl0b32hii/image/upload/v1763480359/ksw7wx53ma3edyfrqh8q.jpg')
 
-        u1 = User(username='admin4', password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()), staff=s)
-        u2 = User(username='student1', password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()), student=student1)
-        u3 = User(username='student2', password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()), student=student2)
-        u4 = User(username='student3', password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()), student=student3)
+        u1 = User(username='admin4', password=str(hashlib.md5('1'.encode('utf-8')).hexdigest()), staff=s)
+        u2 = User(username='student1', password=str(hashlib.md5('1'.encode('utf-8')).hexdigest()), student=student1)
+        u3 = User(username='student2', password=str(hashlib.md5('1'.encode('utf-8')).hexdigest()), student=student2)
+        u4 = User(username='student3', password=str(hashlib.md5('1'.encode('utf-8')).hexdigest()), student=student3)
 
         db.session.add_all([u1, u2, u3, u4])
 
@@ -199,14 +203,6 @@ if __name__ == '__main__':
 
         db.session.commit()
 
-
-        # # Invoice
-        # with open('data/invoices.json', 'r', encoding='utf-8') as f:
-        #     data = json.load(f)
-        #     for inv in data:
-        #         c = Invoice(**inv)
-        #         db.session.add(c)
-        #     db.session.commit()
 
         # Course
         with open('data/courses.json', 'r', encoding='utf-8') as f:
@@ -245,6 +241,14 @@ if __name__ == '__main__':
             data = json.load(f)
             for en in data:
                 c = Enrollment(**en)
+                db.session.add(c)
+            db.session.commit()
+
+        # Invoice
+        with open('data/invoices.json', 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            for inv in data:
+                c = Invoice(**inv)
                 db.session.add(c)
             db.session.commit()
 
