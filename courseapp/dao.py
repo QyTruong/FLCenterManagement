@@ -9,10 +9,16 @@ from sqlalchemy.sql import extract
 def get_courses():
     return Course.query.all()
 
-def get_course_by_id(course_id):
-    return Course.query.get(course_id)
+def get_students():
+    return Student.query.all()
 
-def get_lessons(course_id):
+def get_sections():
+    return Section.query.all()
+
+def get_enrollments():
+    return Enrollment.query.all()
+
+def get_lessons_by_course_id(course_id):
     query = Lesson.query.filter(Lesson.active.__eq__(True))
 
     if course_id:
@@ -20,13 +26,22 @@ def get_lessons(course_id):
 
     return query.all()
 
-def get_sections(course_id):
+def get_course_by_id(course_id):
+    return Course.query.get(course_id)
+
+def get_student_by_id(student_id):
+    return Student.query.filter(Student.id.__eq__(student_id)).first()
+
+def get_sections_by_course_id(course_id):
     query = Section.query.filter(Section.active.__eq__(True))
 
     if course_id:
         query = query.filter(Section.course_id.__eq__(course_id))
 
     return query.all()
+
+def get_section_by_id(section_id):
+    return Section.query.get(section_id)
 
 def get_user_by_id(user_id):
     return User.query.get(user_id)
@@ -55,12 +70,12 @@ def add_user(name, username, password, email, avatar=None):
         db.session.rollback()
         raise Exception('Username này đã tồn tại !')
 
-def check_schedule_existed(schedule):
+def check_schedule_existed(schedule, student_id):
     query = db.session.query(Section) \
         .join(Enrollment, Enrollment.section_id.__eq__(Section.id)) \
         .filter(
         Enrollment.status.__eq__(EnrollStatus.REGISTERED),
-        Enrollment.student_id.__eq__(current_user.id),
+        Enrollment.student_id.__eq__(student_id),
         Section.schedule.__eq__(schedule)
     )
 
@@ -70,12 +85,12 @@ def check_schedule_existed(schedule):
 
     return None
 
-def add_to_enrollment(section_id, unit_price):
+def add_to_enrollment(section_id, unit_price, student_id):
     section = Section.query.filter(Section.id.__eq__(section_id)).first()
     classroom = Classroom.query.filter(Classroom.id.__eq__(section.classroom_id)).first()
     enrollment_cancelled_existing = Enrollment.query.filter(
         Enrollment.status.__eq__(EnrollStatus.CANCELLED),
-        Enrollment.student_id.__eq__(current_user.id),
+        Enrollment.student_id.__eq__(student_id),
         Enrollment.section_id.__eq__(section_id)
     ).first()
 
@@ -88,7 +103,7 @@ def add_to_enrollment(section_id, unit_price):
             invoice_unactive_existing.active = True
         else:
             invoice = Invoice(amount=unit_price)
-            enrollment = Enrollment(student_id=current_user.id, section_id=section_id, unit_price=unit_price, invoice=invoice)
+            enrollment = Enrollment(student_id=student_id, section_id=section_id, unit_price=unit_price, invoice=invoice)
             db.session.add(enrollment)
             db.session.add(invoice)
 
@@ -115,8 +130,8 @@ def cancel_enrollment(enrollment_id):
 
 def get_enrollment_existed(course_id):
     if current_user.is_authenticated:
-        query = db.session.query(Enrollment) \
-            .join(Section, Section.id == Enrollment.section_id) \
+        query = db.session.query(Enrollment)\
+            .join(Section, Section.id == Enrollment.section_id)\
             .filter(
             Enrollment.student_id.__eq__(current_user.id),
             Section.course_id.__eq__(course_id),
@@ -126,7 +141,6 @@ def get_enrollment_existed(course_id):
         return query
 
     return None
-
 
 
 #------THÔNG KÊ---------
