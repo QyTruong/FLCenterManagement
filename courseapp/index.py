@@ -14,40 +14,46 @@ def index():
 def course_list():
     courses = dao.get_courses()
 
-    return render_template('course_register.html', courses=courses)
+    return render_template('course_list.html', courses=courses)
 
 @app.route('/courses/<int:course_id>')
 def course_detail(course_id):
-    lessons = dao.get_lessons(course_id=course_id)
+    lessons = dao.get_lessons_by_course_id(course_id=course_id)
     course = dao.get_course_by_id(course_id=course_id)
-    sections = dao.get_sections(course_id=course_id)
+    sections = dao.get_sections_by_course_id(course_id=course_id)
     enrollment_existed = dao.get_enrollment_existed(course_id=course_id)
 
-    return render_template('course_detail.html', lessons=lessons, course=course, sections=sections, enrollment_existed=enrollment_existed)
+    return render_template('course_detail.html',
+                           lessons=lessons,
+                           course=course,
+                           sections=sections,
+                           enrollment_existed=enrollment_existed)
+
 
 @app.route('/api/enroll-section', methods=['POST'])
 def enroll_section():
-    section_id = request.json.get('section_id')
-    unit_price = request.json.get('price')
-    schedule = request.json.get('schedule')
-    classroom_name = request.json.get('classroom_name')
-    course_name = request.json.get('course_name')
+    section_id = int(request.json.get('section_id'))
+    section = dao.get_section_by_id(section_id=section_id)
+    unit_price = section.course.price
+    schedule = section.schedule
+    classroom_name = section.classroom.name
+    course_name = section.course.name
+
 
     try:
-        schedule_existed = dao.check_schedule_existed(schedule)
+        schedule_existed = dao.check_schedule_existed(schedule=schedule, student_id=current_user.id)
         if not schedule_existed:
-            check_enroll = dao.add_to_enrollment(section_id=section_id, unit_price=unit_price)
-            if not check_enroll:
+            enroll = dao.add_to_enrollment(section_id=section_id, unit_price=unit_price, student_id=current_user.id)
+            if not enroll:
                 return {'message': 'Lớp học đã đủ số lượng học viên, vui lòng đăng ký lớp khác'}
             else:
-                utils.send_email_enrollment(course_name=course_name, classroom_name=classroom_name, schedule=schedule, unit_price=unit_price)
+                utils.send_email_enrollment(course_name=course_name, classroom_name=classroom_name, schedule=schedule, unit_price=unit_price, student=current_user.student)
+                return {'message': 'Đăng ký thành công'}
         else:
             return {'message': f'Phiên học {schedule_existed} đã được đăng ký, vui lòng đăng phiên học khác'}
 
     except Exception as e:
         return {'message': str(e)}
-
-    return {'message': 'Đăng ký thành công'}
 
 
 @app.route('/api/cancel-section', methods=['PATCH'])
@@ -60,6 +66,40 @@ def cancel_section():
         return {'message': str(e)}
 
     return {'message': 'Hủy đăng ký thành công'}
+
+
+# @app.route('/staff-enroll-section')
+# def staff_enroll_section_view():
+#     students = dao.get_students()
+#     sections = dao.get_sections()
+#     enrollments = dao.get_enrollments()
+#
+#     return render_template('staff_enroll.html',
+#                            students=students,
+#                            sections=sections,
+#                            enrollments=enrollments)
+
+# @app.route('/staff-enroll-section', methods='POST')
+# def staff_enroll_section():
+#     student_id = request.form.get('student_id')
+#     section_id = request.form.get('section_id')
+#     section = dao.get_section_by_id(section_id=section_id)
+#     unit_price = section.course.price
+#     schedule = section.schedule
+#
+#     try:
+#         schedule_existed = dao.check_schedule_existed(schedule=schedule, student_id=student_id)
+#         if not schedule_existed:
+#             enroll = dao.add_to_enrollment(section_id=section_id, unit_price=unit_price, student_id=student_id)
+#             if not enroll:
+#                 return render_template('staff_enroll.html', err_msg='Lớp học đã đủ số lượng học viên, vui lòng đăng ký lớp khác')
+#             else:
+#                 return render_template('staff_enroll.html', err_msg='Đăng ký thành công')
+#         else:
+#             return render_template('staff_enroll.html', err_msg=f'Phiên học {schedule_existed} đã được đăng ký, vui lòng đăng phiên học khác')
+#
+#     except Exception as e:
+#         return {'message': str(e)}
 
 
 @app.route('/register-account', methods=['GET', 'POST'])

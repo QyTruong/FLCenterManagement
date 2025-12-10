@@ -58,6 +58,7 @@ class Staff(db.Model):
     name = Column(String(50), nullable=False)
     email = Column(String(50), nullable=False)
     avatar = Column(String(255), nullable=False)
+    is_admin = Column(Boolean, default=False)
 
     invoices = relationship("Invoice", backref="staff", lazy=True)
 
@@ -179,7 +180,10 @@ if __name__ == '__main__':
 
         import hashlib
 
-        s = Staff(name='Staff4', email='staff4@gmail.com',
+        s1 = Staff(name='Staff1', email='staff1@gmail.com',
+                  avatar='https://res.cloudinary.com/dl0b32hii/image/upload/v1763480359/ksw7wx53ma3edyfrqh8q.jpg', is_admin=True)
+
+        s2 = Staff(name='Staff2', email='staff1@gmail.com',
                   avatar='https://res.cloudinary.com/dl0b32hii/image/upload/v1763480359/ksw7wx53ma3edyfrqh8q.jpg')
 
         student1 = Student(name='student1', email='truong.4725212@gmail.com',
@@ -189,17 +193,16 @@ if __name__ == '__main__':
         student3 = Student(name='student3', email='truong.4725212@gmail.com',
                            avatar='https://res.cloudinary.com/dl0b32hii/image/upload/v1763480359/ksw7wx53ma3edyfrqh8q.jpg')
 
-        u1 = User(username='admin4', password=str(hashlib.md5('1'.encode('utf-8')).hexdigest()), staff=s)
-        u2 = User(username='student1', password=str(hashlib.md5('1'.encode('utf-8')).hexdigest()), student=student1)
-        u3 = User(username='student2', password=str(hashlib.md5('1'.encode('utf-8')).hexdigest()), student=student2)
-        u4 = User(username='student3', password=str(hashlib.md5('1'.encode('utf-8')).hexdigest()), student=student3)
+        u1 = User(username='admin', password=str(hashlib.md5('1'.encode('utf-8')).hexdigest()), staff=s1)
+        u2 = User(username='staff1', password=str(hashlib.md5('1'.encode('utf-8')).hexdigest()), staff=s2)
+        u3 = User(username='student1', password=str(hashlib.md5('1'.encode('utf-8')).hexdigest()), student=student1)
+        u4 = User(username='student2', password=str(hashlib.md5('1'.encode('utf-8')).hexdigest()), student=student2)
+        u5 = User(username='student3', password=str(hashlib.md5('1'.encode('utf-8')).hexdigest()), student=student3)
 
-        db.session.add_all([u1, u2, u3, u4])
+        db.session.add_all([u1, u2, u3, u4, u5])
 
-        db.session.add(s)
-        db.session.add(student1)
-        db.session.add(student2)
-        db.session.add(student3)
+        db.session.add_all([s1,s2])
+        db.session.add_all([student1,student2,student3])
 
         db.session.commit()
 
