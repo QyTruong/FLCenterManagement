@@ -1,20 +1,20 @@
 [{
   "name" : "Beginner",
-  "image" : "static/images/course.jpg",
+  "image" : "https://res.cloudinary.com/dufzeox2u/image/upload/v1765533118/cytwqywrdeu0ag1l99pb.png",
   "description": "Khóa học dành cho người mới bắt đầu, mất gốc, hỏng kiến thức",
   "start_date": "2026-01-01",
   "end_date": "2026-03-01",
   "price" : 500000
 }, {
   "name" : "Intermediate",
-  "image" : "static/images/course.jpg",
+  "image" : "https://res.cloudinary.com/dufzeox2u/image/upload/v1765533119/nr37xlwkkepfh2uev1xz.jpg",
   "description": "Khóa học dành cho người học để đi làm, phục vụ trong công việc",
   "start_date": "2026-01-01",
   "end_date": "2026-03-01",
   "price" : 1000000
 }, {
   "name" : "Advanced",
-  "image" : "static/images/course.jpg",
+  "image" : "https://res.cloudinary.com/dufzeox2u/image/upload/v1765533120/vtsu9rbwy51ax1ipiubh.jpg",
   "description": "Khóa học dành cho người thi chứng chỉ phục vụ cho việc xuất ngoại",
   "start_date": "2026-01-01",
   "end_date": "2026-03-01",

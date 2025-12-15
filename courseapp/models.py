@@ -193,6 +193,7 @@ if __name__ == '__main__':
         student3 = Student(name='student3', email='truong.4725212@gmail.com',
                            avatar='https://res.cloudinary.com/dl0b32hii/image/upload/v1763480359/ksw7wx53ma3edyfrqh8q.jpg')
 
+
         u1 = User(username='admin', password=str(hashlib.md5('1'.encode('utf-8')).hexdigest()), staff=s1)
         u2 = User(username='staff1', password=str(hashlib.md5('1'.encode('utf-8')).hexdigest()), staff=s2)
         u3 = User(username='student1', password=str(hashlib.md5('1'.encode('utf-8')).hexdigest()), student=student1)

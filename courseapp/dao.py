@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlalchemy.exc import IntegrityError
 from models import Course, Lesson, Classroom, User, Student, Teacher, Staff, Section, Enrollment, Invoice, Score, Result, EnrollStatus
 import hashlib
@@ -13,10 +15,10 @@ def get_students():
     return Student.query.all()
 
 def get_sections():
-    return Section.query.all()
+    return Section.query.order_by(Section.course_id).all()
 
 def get_enrollments():
-    return Enrollment.query.all()
+    return Enrollment.query.order_by(Enrollment.student_id).all()
 
 def get_lessons_by_course_id(course_id):
     query = Lesson.query.filter(Lesson.active.__eq__(True))
@@ -97,6 +99,7 @@ def add_to_enrollment(section_id, unit_price, student_id):
     if section.current_size < classroom.capacity:
         if enrollment_cancelled_existing:
             enrollment_cancelled_existing.status = EnrollStatus.REGISTERED
+            enrollment_cancelled_existing.enroll_date = datetime.now()
             invoice_unactive_existing = Invoice.query.filter(
                 Invoice.id.__eq__(enrollment_cancelled_existing.id)
             ).first()
@@ -121,6 +124,7 @@ def cancel_enrollment(enrollment_id):
 
     if section.current_size > 0 and enrollment:
         enrollment.status = EnrollStatus.CANCELLED
+        enrollment.enroll_date = datetime.now()
         invoice_active_existing = Invoice.query.filter(
             Invoice.id.__eq__(enrollment.id)
         ).first()
@@ -128,17 +132,16 @@ def cancel_enrollment(enrollment_id):
         section.current_size -= 1
         db.session.commit()
 
-def get_enrollment_existed(course_id):
-    if current_user.is_authenticated:
-        query = db.session.query(Enrollment)\
-            .join(Section, Section.id == Enrollment.section_id)\
-            .filter(
-            Enrollment.student_id.__eq__(current_user.id),
-            Section.course_id.__eq__(course_id),
-            Enrollment.status.__eq__(EnrollStatus.REGISTERED)
-        ).first()
+def get_enrollment_existed(course_id, student_id):
+    query = db.session.query(Enrollment)\
+        .join(Section, Section.id == Enrollment.section_id)\
+        .filter(
+        Enrollment.student_id.__eq__(student_id),
+        Section.course_id.__eq__(course_id),
+        Enrollment.status.__eq__(EnrollStatus.REGISTERED)
+    ).first()
 
-        return query
+    return query
 
     return None
 

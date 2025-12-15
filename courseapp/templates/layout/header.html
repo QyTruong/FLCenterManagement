@@ -10,12 +10,26 @@
                     <a class="nav-link" href="/">Trang chủ</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('course_list') }}">Khóa học</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Giới thiệu</a>
+                    <a class="nav-link" href="/">Giới thiệu</a>
                 </li>
                 {% if current_user.is_authenticated %}
+                    {% if current_user.student %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('course_list') }}">Khóa học</a>
+                    </li>
+                    {% endif %}
+                {% endif %}
+
+                {% if current_user.is_authenticated %}
+                    {% if current_user.staff and not current_user.staff.is_admin %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/staff-enroll-section">Đăng ký khóa học</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/invoice-creating">Lập hóa đơn</a>
+                    </li>
+                    {% endif %}
+
                     {% if current_user.role.avatar %}
                     <li class="nav-item">
                         <img src="{{ current_user.role.avatar }}" alt="{{ current_user.role.name }}" class="rounded-circle" width="40" height="40" style="object-fit: cover;">
