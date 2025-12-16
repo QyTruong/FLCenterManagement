@@ -89,7 +89,7 @@ class Teacher(db.Model):
     avatar = Column(String(255), nullable=False)
     specialization = Column(String(50), nullable=True)
 
-    classrooms = relationship('Classroom', backref='teacher', lazy=True)
+    sections = relationship('Section', backref='teacher', lazy=True)
 
     def __str__(self):
         return self.name
@@ -99,7 +99,6 @@ class Classroom(BaseModel):
 
     name = Column(String(50), nullable=False)
     capacity = Column(Integer, nullable=False)
-    teacher_id = Column(Integer, ForeignKey(Teacher.id), nullable=True)
 
     sections = relationship('Section', backref='classroom', lazy=True)
 
@@ -143,6 +142,7 @@ class Section(BaseModel):
     classroom_id = Column(Integer, ForeignKey('classroom.id'), nullable=False)
     course_id = Column(Integer, ForeignKey('course.id'), nullable=False)
     current_size = Column(Integer, default=0)
+    teacher_id = Column(Integer, ForeignKey(Teacher.id), nullable=True)
 
     enrollments = relationship('Enrollment', backref='section', lazy=True)
 
