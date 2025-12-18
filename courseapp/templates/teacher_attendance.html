@@ -1,0 +1,34 @@
+{% extends "layout/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="text-center mb-4">📋 Điểm danh</h2>
+
+  {% if sections %}
+    <ul class="list-group">
+      {% for s in sections %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <div>
+            <strong>Lớp {{ s.id }}</strong> —
+            {{ s.course.name }}
+            <br>
+            <small class="text-muted">
+              Phòng: {{ s.classroom.name }}
+              Lịch: {{ s.schedule }}
+            </small>
+          </div>
+
+          <a class="btn btn-primary btn-sm"
+             href="{{ url_for('teacher_attendance_section', section_id=s.id) }}">
+            Điểm danh
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="text-center text-muted">
+      😢 Bạn chưa được phân dạy lớp nào
+    </p>
+  {% endif %}
+</div>
+{% endblock %}

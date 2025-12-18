@@ -1,0 +1,32 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Khóa học của tôi{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>📚 Khóa học của tôi</h2>
+
+    {% if courses %}
+        <div class="row">
+            {% for c in courses %}
+            <div class="col-md-4 col-8 p-2">
+                <div class="card" style="height: 550px">
+                    <img class="card-img-top" src="{{ c.image }}" alt="{{ c.name }}">
+                    <div class="card-body">
+                        <h4 class="card-title">{{ c.name }}</h4>
+                        <p class="card-text"><b>Mô tả:</b> {{ c.description }}</p>
+                        <div class="d-flex justify-content-around pt-4">
+                            <a href="{{ url_for('student_course_detail', course_id=c.id) }}" class="btn btn-primary btn-lg w-100 p-3">
+                                Xem chi tiết
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>Bạn chưa đăng ký khóa học nào.</p>
+    {% endif %}
+</div>
+{% endblock %}

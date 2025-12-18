@@ -1,0 +1,85 @@
+{% extends 'layout/base.html'  %}
+
+{% block title %}Chi tiết khóa học{% endblock %}
+
+{% block content %}
+
+{% if request.args.get('err_msg') %}
+<div class="alert alert-danger d-flex align-items-center">
+    <div>{{ request.args.get('err_msg') }}</div>
+    <button type="button" class="close ml-auto" data-dismiss="alert">x</button>
+</div>
+{% endif %}
+
+{% if request.args.get('msg') %}
+<div class="alert alert-success d-flex align-items-center">
+    <div>{{ request.args.get('msg') }}</div>
+    <button type="button" class="close ml-auto" data-dismiss="alert">x</button>
+</div>
+{% endif %}
+
+<h1 class="text-center">Trang đăng ký khóa học cho học viên</h1>
+<form onsubmit="enrollSectionByStaff()" class="row mt-4">
+    <div class="col-md-4 col-xs-12">
+        <label for="student">Chọn học viên</label>
+        <select class="form-control" name="student_id" id="student">
+            {% for s in students %}
+            <option value="{{ s.id }}">Tên học viên: {{ s.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-8 col-xs-12">
+        <label for="section">Chọn phiên học</label>
+        <select class="form-control" name="section_id" id="section">
+            {% for s in sections %}
+            <option value="{{ s.id }}">
+                 Tên khóa học: {{ s.course.name }}
+                &nbsp;| &nbsp; Tên lớp: {{ s.classroom.name }}
+                &nbsp;| &nbsp; Thời gian: {{ s.schedule }}
+                &nbsp;| &nbsp; Sĩ số lớp: {{ s.current_size }}/{{ s.classroom.capacity }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+    <button class="btn btn-danger w-100 mt-4">Đăng ký</button>
+</form>
+
+<br>
+<hr>
+<br>
+
+<h2 class="text-center">Danh sách đăng ký</h2>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Mã đăng ký</th>
+            <th>Tên học viên</th>
+            <th>Tên khóa học</th>
+            <th>Tên lớp</th>
+            <th>Ngày đăng ký</th>
+            <th>Trạng thái đăng ký</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for e in enrollments %}
+        <tr>
+            <td>{{ e.id }}</td>
+            <td>{{ e.student }}</td>
+            <td>{{ e.section.course }}</td>
+            <td>{{ e.section.classroom }}</td>
+            <td>{{ e.enroll_date }}</td>
+            <td>{{ e.status.name }}</td>
+            {% if e.status.name == 'CANCELLED' %}
+            <td>Đã hủy</td>
+            {% else %}
+            <td>
+                <button class="btn btn-sm btn-danger" onclick="cancelSection({{ e.id }})">X</button>
+            </td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

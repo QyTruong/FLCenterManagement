@@ -54,6 +54,7 @@ class Staff(db.Model):
     name = Column(String(50), nullable=False)
     email = Column(String(50), nullable=False)
     avatar = Column(String(255), nullable=False)
+    is_admin = Column(Boolean, default=False)
 
     invoices = relationship("Invoice", backref="staff", lazy=True)
 
@@ -121,13 +122,14 @@ class Score(BaseModel):
     type = Column(String(50), nullable=False)
     result = Column(Enum(Result), nullable=False)
     enrollment_id = Column(Integer, ForeignKey(Enrollment.id), nullable=True)
+    attendance = Column(Boolean, default=False)
 
 class Invoice(BaseModel):
     __tablename__ = 'invoice'
 
     amount = Column(Float, nullable=False)
     payment_date = Column(DateTime, default=datetime.now())
-    staff_id = Column(Integer, ForeignKey(Staff.id), nullable=False)
+    staff_id = Column(Integer, ForeignKey(Staff.id), nullable=True)
 
     enrollments = relationship('Enrollment', backref='invoice', lazy=True)
 
@@ -137,6 +139,8 @@ class Section(BaseModel):
     schedule = Column(String(50), nullable=False)
     classroom_id = Column(Integer, ForeignKey('classroom.id'), nullable=False)
     course_id = Column(Integer, ForeignKey('course.id'), nullable=False)
+    current_size = Column(Integer, default=0)
+    teacher_id = Column(Integer, ForeignKey(Teacher.id), nullable=True)
 
     enrollments = relationship('Enrollment', backref='section', lazy=True)
 
@@ -171,6 +175,48 @@ if __name__ == '__main__':
     with app.app_context():
         db.drop_all()
         db.create_all()
+        import hashlib
+
+        s1 = Staff(name='Staff1', email='staff1@gmail.com',
+                   avatar='https://res.cloudinary.com/dl0b32hii/image/upload/v1763480359/ksw7wx53ma3edyfrqh8q.jpg',
+                   is_admin=True)
+
+        s2 = Staff(name='Staff2', email='staff1@gmail.com',
+                   avatar='https://res.cloudinary.com/dl0b32hii/image/upload/v1763480359/ksw7wx53ma3edyfrqh8q.jpg')
+
+        student1 = Student(name='student1', email='truong.4725212@gmail.com',
+                           avatar='https://res.cloudinary.com/dl0b32hii/image/upload/v1763480359/ksw7wx53ma3edyfrqh8q.jpg')
+        student2 = Student(name='student2', email='truong.4725212@gmail.com',
+                           avatar='https://res.cloudinary.com/dl0b32hii/image/upload/v1763480359/ksw7wx53ma3edyfrqh8q.jpg')
+        student3 = Student(name='student3', email='truong.4725212@gmail.com',
+                           avatar='https://res.cloudinary.com/dl0b32hii/image/upload/v1763480359/ksw7wx53ma3edyfrqh8q.jpg')
+        teacher1 = Teacher( name='Teacher A',email='teacherA@gmail.com',
+                            avatar='https://res.cloudinary.com/dl0b32hii/image/upload/v1763480359/ksw7wx53ma3edyfrqh8q.jpg')
+        teacher2 = Teacher(name='Teacher B', email='teacher1@gmail.com',
+                           avatar='https://res.cloudinary.com/dl0b32hii/image/upload/v1763480359/ksw7wx53ma3edyfrqh8q.jpg')
+        teacher3 = Teacher(name='Teacher C',email='teacherC@gmail.com',
+                            avatar='https://res.cloudinary.com/dl0b32hii/image/upload/v1763480359/ksw7wx53ma3edyfrqh8q.jpg')
+
+        u1 = User(username='admin', password=str(hashlib.md5('1'.encode('utf-8')).hexdigest()), staff=s1)
+        u2 = User(username='staff1', password=str(hashlib.md5('1'.encode('utf-8')).hexdigest()), staff=s2)
+        u3 = User(username='student1', password=str(hashlib.md5('1'.encode('utf-8')).hexdigest()), student=student1)
+        u4 = User(username='student2', password=str(hashlib.md5('1'.encode('utf-8')).hexdigest()), student=student2)
+        u5 = User(username='student3', password=str(hashlib.md5('1'.encode('utf-8')).hexdigest()), student=student3)
+        u6 = User(username='teacher1', password=str(hashlib.md5('1'.encode('utf-8')).hexdigest()), teacher=teacher1)
+        u7 = User(username='teacher2', password=str(hashlib.md5('1'.encode('utf-8')).hexdigest()), teacher=teacher2)
+        u8 = User(username='teacher3', password=str(hashlib.md5('1'.encode('utf-8')).hexdigest()), teacher=teacher3)
+
+        db.session.add_all([u1, u2, u3, u4, u5])
+        db.session.add_all([ u6, u7, u8])
+
+        db.session.add_all([s1, s2])
+        db.session.add_all([student1, student2, student3])
+
+        db.session.add_all([teacher1, teacher2, teacher3])
+
+
+
+        db.session.commit()
 
         # Course
         with open('data/courses.json', 'r', encoding='utf-8') as f:
@@ -204,35 +250,23 @@ if __name__ == '__main__':
                 db.session.add(s)
             db.session.commit()
 
+            # Enrollment
+            with open('data/enrollments.json', 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                for en in data:
+                    c = Enrollment(**en)
+                    db.session.add(c)
+                db.session.commit()
 
-        #User
-        with open('data/users.json', 'r', encoding='utf-8') as f:
-            data = json.load(f)
-            for us in data:
-                u = User(**us)
-                db.session.add(u)
-            db.session.commit()
+            # Invoice
+            with open('data/invoices.json', 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                for inv in data:
+                    c = Invoice(**inv)
+                    db.session.add(c)
+                db.session.commit()
 
-        # Admin
-        with open('data/staff.json', 'r', encoding='utf-8') as f:
-            data = json.load(f)
-            for ad in data:
-                a = Staff(**ad)
-                db.session.add(a)
-            db.session.commit()
 
-        #Student
-        with open('data/students.json', 'r', encoding='utf-8') as f:
-            data = json.load(f)
-            for st in data:
-                s = Student(**st)
-                db.session.add(s)
-            db.session.commit()
 
-        # Teacher
-        with open('data/teachers.json', 'r', encoding='utf-8') as f:
-            data = json.load(f)
-            for te in data:
-                t = Teacher(**te)
-                db.session.add(t)
-            db.session.commit()
+
+

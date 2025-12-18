@@ -1,0 +1,77 @@
+{% extends 'layout/base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <div class="mb-3">
+        <a href="{{ url_for('teacher_sections') }}" class="btn btn-outline-secondary btn-sm">← Quay lại lớp học</a>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-3 p-3 bg-light border-bottom">
+        <h3 class="m-0 text-primary">📝 Nhập điểm lớp #{{ section_id }}</h3>
+        <button type="button" class="btn btn-success fw-bold" onclick="addColumn()">+ THÊM CỘT</button>
+    </div>
+
+    <form method="POST">
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle">
+                <thead class="table-dark text-center">
+                    <tr id="score-header">
+                        <th>#</th>
+                        <th>Học viên</th>
+                        <th style="width:100px">GK</th>
+                        <th style="width:100px">CK</th>
+                        {% for col in extra_cols %}
+                        <th data-column="{{ col }}" class="extra-header">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span>{{ col }}</span>
+                                <button type="button" class="btn-del" onclick="deleteCol('{{ col }}')">&times;</button>
+                            </div>
+                        </th>
+                        {% endfor %}
+                        <th id="anchor-h" style="display:none"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for enrollment, student in students %}
+                    <tr class="student-row" data-sid="{{ student.id }}">
+                        <td class="text-center">{{ loop.index }}</td>
+                        <td><b>{{ student.name }}</b></td>
+                        <td><input type="number" step="0.1" name="mid_{{ student.id }}" class="form-control text-center" value="{{ scores_map.get(enrollment.id, {}).get('mid', 0) }}"></td>
+                        <td><input type="number" step="0.1" name="final_{{ student.id }}" class="form-control text-center" value="{{ scores_map.get(enrollment.id, {}).get('final', 0) }}"></td>
+                        {% for col in extra_cols %}
+                        <td data-column="{{ col }}">
+                            <input type="number" step="0.1" name="extra_score_{{ col }}_{{ student.id }}" class="form-control text-center" value="{{ scores_map.get(enrollment.id, {}).get(col, 0) }}">
+                        </td>
+                        {% endfor %}
+                        <td class="anchor-c" style="display:none"></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <button type="submit" class="btn btn-primary w-100 mt-3 py-2 fw-bold">💾 LƯU BẢNG ĐIỂM</button>
+    </form>
+</div>
+
+<script>
+function addColumn() {
+    let name = prompt("Tên cột mới:");
+    if (name && name.trim() !== "") window.location.reload();
+}
+
+function deleteCol(colName) {
+    if (!confirm(`Xóa cột ${colName}?`)) return;
+    fetch('/api/delete-column', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ section_id: {{ section_id }}, col_name: colName })
+    }).then(() => {
+        document.querySelectorAll(`[data-column="${colName}"]`).forEach(el => el.remove());
+    });
+}
+</script>
+
+<style>
+    .extra-header:hover .btn-del { display: block; }
+    .btn-del { display: none; background: red; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; }
+</style>
+{% endblock %}

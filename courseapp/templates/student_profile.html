@@ -1,0 +1,84 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Thông tin cá nhân{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+
+        <!-- Cột trái: Avatar + Menu -->
+        <div class="col-md-3 text-center">
+            <img src="{{ current_user.student.avatar or url_for('static', filename='images/default_avatar.jpg') }}"
+                 class="rounded-circle mb-3" width="150" height="150">
+
+            <div class="list-group text-start">
+                <a href="{{ url_for('student_profile') }}" class="list-group-item list-group-item-action active">
+                    Thông tin cá nhân
+                </a>
+                <a href="{{ url_for('student_courses') }}" class="list-group-item list-group-item-action">
+                    Khóa học của tôi
+                </a>
+                <a href="{{ url_for('student_schedule') }}" class="list-group-item list-group-item-action">
+                    Lịch học
+                </a>
+                <a href="{{ url_for('student_scores') }}" class="list-group-item list-group-item-action">
+                    Xem điểm
+                </a>
+            </div>
+        </div>
+
+        <!-- Cột phải: Thông tin -->
+        <div class="col-md-9">
+            <h3 class="mb-4">Thông tin cá nhân</h3>
+            <table class="table">
+                <tr>
+                    <th>Họ và Tên</th>
+                    <td>{{ current_user.student.name }}</td>
+                    <td class="text-end">
+                        <a href="{{ url_for('student_profile_edit') }}" class="text-success">chỉnh sửa</a>
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>Email</th>
+                    <td>{{ current_user.student.email }}</td>
+                    <td class="text-end text-muted">
+                        <i class="fa fa-lock"></i>
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>Tên đăng nhập</th>
+                    <td>{{ current_user.username }}</td>
+                    <td></td>
+                </tr>
+
+                <tr>
+                    <th>Mật khẩu</th>
+                    <td>******</td>
+                    <td class="text-end">
+                        <a href="#" class="text-success">chỉnh sửa</a>
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>Ngày sinh</th>
+                    <td>Chưa có</td>
+                    <td class="text-end">
+                        <a href="#" class="text-success">chỉnh sửa</a>
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>Số điện thoại</th>
+                    <td>Chưa có</td>
+                    <td class="text-end">
+                        <a href="#" class="text-success">chỉnh sửa</a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

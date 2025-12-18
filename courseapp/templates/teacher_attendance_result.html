@@ -1,0 +1,36 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Kết quả điểm danh lớp {{ section_id }}{% endblock %}
+
+{% block content %}
+<h2>Danh sách học viên đã điểm danh lớp {{ section_id }}</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Tên học viên</th>
+            <th>Email</th>
+            <th>Trạng thái</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for enrollment, student in students %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ student.name }}</td>
+            <td>{{ student.email }}</td>
+<!--            <td>{{ "Vắng" if enrollment.attendance else "Có mặt" }}</td>-->
+            <td>
+               {% if enrollment.attendance %} Vắng
+                {% else %} Có mặt
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{{ url_for('teacher_attendance_section', section_id=section_id) }}" class="btn btn-secondary">Quay lại điểm danh</a>
+<a href="{{ url_for('teacher_sections') }}" class="btn btn-secondary">Danh sách lớp</a>
+{% endblock %}

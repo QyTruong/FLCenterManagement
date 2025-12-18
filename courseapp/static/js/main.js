@@ -37,6 +37,6 @@ function cancelSection(enrollment_existed_id){
         alert(data.message)
 
         location.reload()
-    })
+    }).catch(err => console.error(err))
 }
 

@@ -1,0 +1,94 @@
+{% extends 'admin/master.html' %}
+{% block body %}
+{{ super() }}
+{% if current_user.is_authenticated and current_user.staff%}
+<h1 class="text-center text-danger">THỐNG KÊ số lượng học viên</h1>
+<div class="row pt-3 pl-2">
+    <div class="col-md-5 col-xs-12">
+       <table class="table table-bordered">
+            <tr class="table-secondary">
+                <th>Mã khóa học</th>
+                <th>Tên khóa học</th>
+                <th>Số lượng học viên</th>
+            </tr>
+            {% for s in stats %}
+            <tr>
+                <td>{{ s[0] }}</td>
+                <td>{{ s[1] }}</td>
+                <td>{{ s[2] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="col-md-7 col-xs-12">
+         <form class="pb-2">
+            <div class="form-group" style="width:600px;">
+                <input type="text" class="form-control" name="kw" placeholder="Nhập khóa học....">
+            </div>
+             <div class="form-group" style="width:600px;">
+                <input type="date" class="form-control" name="from_date" >
+            </div>
+             <div class="form-group" style="width:600px;">
+                <input type="date" class="form-control" name="to_date" >
+            </div>
+            <input type="submit" value="Thống kê" class="btn btn-primary">
+        </form>
+        <div style="height: 250px; width: 600px;">
+            <canvas id="StudentStatsChart">
+            </canvas>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    let labels = []
+    let data = []
+    let colors = []
+    let borderColor = []
+    let r ,g, b
+
+    {% for s in stats %}
+    {% if s[2] %}
+
+    labels.push('{{ s[1] }}')
+    data.push({{ s[2] }})
+    r = Math.random()*255
+    g = Math.random()*255
+    b = Math.random()*255
+    colors.push(`rgba(${r}, ${g}, ${b}, 0.3)`)
+    borderColor.push(`rgba(${r}, ${g}, ${b}, 1)`)
+
+    {% endif %}
+    {% endfor %}
+
+    window.onload = function(){
+    const ctx = document.getElementById('StudentStatsChart').getContext('2d');
+
+    loadChart(ctx, labels, data,'bar', colors, borderColor )
+    }
+
+function loadChart(ctx,labels, data, type){
+     const myChart = new Chart(ctx, {
+        type: type,
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Thống kê số lượng sinh viên từng khóa học',
+            data: data,
+            backgroundColor: colors,
+            borderColor: borderColor,
+            borderWidth: 1
+          }]
+        },
+        options: {
+        responsive: true,
+        maintainAspectRatio: false
+        }
+     });
+}
+</script>
+{% endif %}
+
+{% endblock%}

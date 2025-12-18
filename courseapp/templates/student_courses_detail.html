@@ -1,0 +1,179 @@
+{% extends 'layout/base.html' %}
+{% block title %}Chi tiết khóa học{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <!-- Tên khóa học -->
+    <h2 class="mb-4">📚 {{ course.name }}</h2>
+
+    <!-- Thông tin khóa học -->
+    <div class="row mb-5">
+        <div class="col-md-6">
+            <img src="{{ course.image }}" class="img-fluid rounded shadow-sm">
+        </div>
+        <div class="col-md-6">
+            <p><b>Mô tả:</b> {{ course.description }}</p>
+            <p><b>Thời gian:</b> {{ course.start_date }} → {{ course.end_date }}</p>
+            <p>
+                <b>Học phí:</b>
+                <span class="fw-semibold text-danger fs-5">
+                    {{ "{:,.0f}".format(course.price) }} VND
+                </span>
+            </p>
+
+            {% if enrollment %}
+            <div class="alert alert-success">
+                ✅ Đã đăng ký:
+                {{ enrollment.section.classroom.name }} –
+                {{ enrollment.section.schedule }}
+            </div>
+            {% else %}
+            <div class="alert alert-warning">
+                ⚠️ Bạn chưa đăng ký lớp học
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Video giới thiệu -->
+    <div class="mb-5">
+        <h5 class="section-title">🎬 Tại sao bạn nên chọn khóa học này?</h5>
+
+        <div class="ratio ratio-21x9 rounded overflow-hidden shadow"
+            style="width: 120%; margin-right: -10%">
+            <iframe
+                src="https://www.youtube.com/embed/jc86akkQ4bo"
+                allowfullscreen>
+            </iframe>
+        </div>
+    </div>
+
+
+    <!-- Mục tiêu khóa học -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <h5 class="section-title">🎯 Mục tiêu khóa học</h5>
+            <ul class="mb-0">
+                <li>Xây dựng nền tảng tiếng Anh giao tiếp vững chắc</li>
+                <li>Cải thiện phát âm và phản xạ tự nhiên</li>
+                <li>Tự tin giao tiếp trong học tập & công việc</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Đánh giá -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <h5 class="section-title">📝 Đánh giá & Cách tính điểm</h5>
+            <ul class="mb-0">
+                <li>Kiểm tra giữa khóa: 40%</li>
+                <li>Kiểm tra cuối khóa: 50%</li>
+                <li>Chuyên cần & tham gia lớp học: 10%</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Nội dung khóa học -->
+    <div class="mb-5">
+        <h5 class="section-title fw-bold">📘 Nội dung khóa học</h5>
+        <p class="text-muted mb-3">3 chương • 25 bài học • 5 giờ học</p>
+
+        <div class="accordion" id="courseContent">
+
+            <!-- Chương 1 -->
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button chapter-header"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#c1">
+                        <div class="chapter-title">
+                            Chương 1:
+                            <span class="chapter-name">Nền tảng tiếng Anh giao tiếp</span>
+                        </div>
+                    </button>
+                </h2>
+                <div id="c1" class="accordion-collapse collapse show">
+                    <div class="accordion-body p-0">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">#1. Lộ trình học tiếng Anh hiệu quả</li>
+                            <li class="list-group-item">#2. Phát âm chuẩn từ đầu</li>
+                            <li class="list-group-item">#3. Trọng âm & ngữ điệu</li>
+                            <li class="list-group-item">#4. Từ vựng giao tiếp hằng ngày</li>
+                            <li class="list-group-item">#5. Mẫu câu thông dụng</li>
+                            <li class="list-group-item">#6. Luyện nghe cơ bản</li>
+                            <li class="list-group-item">#7. Phản xạ giao tiếp</li>
+                            <li class="list-group-item">#8. Lỗi sai người Việt hay gặp</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chương 2 -->
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed chapter-header"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#c2">
+                        <div class="chapter-title">
+                            Chương 2:
+                            <span class="chapter-name">4 kỹ năng Nghe – Nói – Đọc – Viết</span>
+                        </div>
+                    </button>
+                </h2>
+                <div id="c2" class="accordion-collapse collapse">
+                    <div class="accordion-body p-0">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">#9. Listening thực tế</li>
+                            <li class="list-group-item">#10. Speaking theo tình huống</li>
+                            <li class="list-group-item">#11. Hội thoại đời sống</li>
+                            <li class="list-group-item">#12. Reading ngắn & nhanh</li>
+                            <li class="list-group-item">#13. Viết câu & email cơ bản</li>
+                            <li class="list-group-item">#14. Ngữ pháp ứng dụng</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chương 3 -->
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed chapter-header"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#c3">
+                        <div class="chapter-title">
+                            Chương 3:
+                            <span class="chapter-name">Ứng dụng thực tế</span>
+                        </div>
+                    </button>
+                </h2>
+                <div id="c3" class="accordion-collapse collapse">
+                    <div class="accordion-body p-0">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">#15. Giao tiếp công việc</li>
+                            <li class="list-group-item">#16. Giao tiếp du lịch</li>
+                            <li class="list-group-item">#17. Hội thoại với người nước ngoài</li>
+                            <li class="list-group-item">#18. Ôn tập & định hướng học tiếp</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Tài liệu -->
+    <div class="card mb-5 shadow-sm">
+        <div class="card-body">
+            <h5 class="section-title">📚 Tài liệu tham khảo</h5>
+            <ul class="mb-0">
+                <li><a href="https://www.duolingo.com/" target="_blank">Duolingo</a></li>
+                <li><a href="https://youglish.com/" target="_blank">YouGlish</a></li>
+                <li><a href="https://www.grammarly.com/" target="_blank">Grammarly</a></li>
+                <li><a href="https://www.khanacademy.org/" target="_blank">Khan Academy</a></li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

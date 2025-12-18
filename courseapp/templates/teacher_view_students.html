@@ -1,0 +1,43 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Danh sách học viên{% endblock %}
+
+{% block content %}
+<h2>Danh sách học viên</h2>
+
+{% if students_attendance %}
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Tên học viên</th>
+            <th>Email</th>
+            <th>Trạng thái điểm danh</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for enrollment, student in students_attendance %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ student.name }}</td>
+            <td>{{ student.email }}</td>
+            <td>
+                {% if enrollment.attendance %}
+                    Có mặt
+                {% else %}
+                    Vắng
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{{ url_for('teacher_attendance_section', section_id=students_attendance[0][0].section_id) }}" class="btn btn-secondary">Quay lại điểm danh</a>
+
+{% else %}
+<p class="text-danger">Hiện tại lớp này chưa có học viên nào.</p>
+<a href="{{ url_for('teacher_attendance') }}" class="btn btn-secondary">Quay lại</a>
+{% endif %}
+
+{% endblock %}

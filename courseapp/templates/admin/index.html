@@ -1,0 +1,114 @@
+{% extends 'admin/master.html' %}
+{% block body %}
+{{ super() }}
+
+{% if current_user.is_authenticated and current_user.staff %}
+<h2 class="text-success text-center mt-1">Chào mừng đến trang quản trị</h2>
+
+<div class="row pt-1">
+    <div class="col-md-3 col-xs-12">
+
+    </div>
+    <div class="col-md-3 col-xs-12">
+
+    </div>
+    <div class="col-md-3 col-xs-12">
+
+    </div>
+</div>
+
+<div class="row pt-2 pl-1">
+    <div class="col-md-5 col-xs-12">
+        <table class="table table-bordered">
+            <tr class="table-secondary">
+                <th>Mã khóa học</th>
+                <th>Tên khóa học</th>
+                <th>Số lượng bài học</th>
+            </tr>
+            {% for s in stats %}
+            <tr>
+                <td>{{ s[0] }}</td>
+                <td>{{ s[1] }}</td>
+                <td>{{ s[2] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="col-md-7 col-xs-12">
+        <div style="height: 400px; width: 600px">
+            <canvas id="myCourseChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    let labels = []
+    let data = []
+    let colors = []
+    let borderColor = []
+    let r ,g, b
+
+    {% for s in stats %}
+    labels.push('{{ s[1] }}')
+    data.push({{ s[2] }})
+
+    r = Math.random()*255
+    g = Math.random()*255
+    b = Math.random()*255
+
+    colors.push(`rgba(${r}, ${g}, ${b}, 0.3)`)
+    borderColor.push(`rgba(${r}, ${g}, ${b}, 1)`)
+    {% endfor %}
+
+    window.onload = function(){
+    const ctx = document.getElementById('myCourseChart').getContext('2d');
+     const myChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Thống kê bài học trong khóa học',
+        data: data,
+        backgroundColor: colors,
+        borderColor: borderColor,
+        borderWidth: 1
+      }]
+    },
+    options: {
+      options: {
+    responsive: true,
+    maintainAspectRatio: false
+}
+    }
+  });
+  }
+</script>
+
+
+{% else %}
+<h3 class="alert alert-danger">Bạn cần đăng nhập với vai trò là nhân viên!</h3>
+
+<!--<h2 class="text-success text-center">ĐĂNG NHẬP TRANG QUẢN TRỊ</h2>-->
+
+<!--<div class="center-box">-->
+<!--    <form method="post" action="/login-account" style="width: 500px;"  class="pb-5">-->
+<!--    <div class="form-group" >-->
+<!--        <label for="name">Tên đăng nhập:</label>-->
+<!--        <input type="text" class="form-control" placeholder="tên đăng nhập" id="name" name="username">-->
+<!--    </div>-->
+<!--    <div class="form-group">-->
+<!--        <label for="pwd">Mật khẩu:</label>-->
+<!--        <input type="password" class="form-control" placeholder="nhâp mật khẩu" id="pwd" name="password">-->
+<!--    </div>-->
+<!--    <button type="submit" class="btn btn-primary">Đăng nhập</button>-->
+<!--</form>-->
+<!--</div>-->
+{% endif %}
+<footer>
+  <div class="jumbotron">
+  <h1>E-commerce Website</h1>
+  <p>Wis &copy; 2021</p>
+</div>
+</footer>
+{% endblock %}

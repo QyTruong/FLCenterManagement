@@ -1,0 +1,30 @@
+{% extends "layout/base.html" %}
+
+{% block content %}
+<h2>📋 Điểm danh lớp {{ section_id }}</h2>
+
+<form method="post">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Học viên</th>
+                <th>Điểm danh</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for enrollment, student in students %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ student.name }}</td>
+                <td>
+                    <input type="checkbox" name="att_{{ student.id }}" {% if enrollment.attendance %}checked{% endif %}>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <button type="submit" class="btn btn-success">Lưu điểm danh</button>
+</form>
+{% endblock %}
