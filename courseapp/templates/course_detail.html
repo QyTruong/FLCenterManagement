@@ -33,23 +33,22 @@
                         <tr>
                             <td>{{ s.classroom }}</td>
                             <td>{{ s.schedule }}</td>
-                            <td>.../{{ s.classroom.capacity }}</td>
+                            <td>{{ s.current_size }}/{{ s.classroom.capacity }}</td>
                             <td>
                                 {% if enrollment_existed %}
                                     {% if enrollment_existed.section_id == s.id %}
-                                        <input type="radio" name="section" value="{{ s.id }}" data-price="{{ s.course.price }}" checked>
+                                        <input type="radio" name="section" value="{{ s.id }}" checked>
                                     {% else %}
-                                        <input type="radio" name="section" value="{{ s.id }}" data-price="{{ s.course.price }}" disabled>
+                                        <input type="radio" name="section" value="{{ s.id }}" disabled>
                                     {% endif %}
                                 {% else %}
-                                    <input type="radio" name="section" value="{{ s.id }}" data-price="{{ s.course.price }}">
+                                    <input type="radio" name="section" value="{{ s.id }}">
                                 {% endif %}
                             </td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
-
             </div>
         </div>
     </div>
@@ -67,6 +66,7 @@
             </div>
             <div class="mb-3">
                 <div class="fw-5"><b>Mô tả:</b> {{ course.description }}</div>
+                <div class="fw-5"><b>Thời gian khóa học diễn ra: </b> <br>{{ course.start_date }} đến {{ course.end_date }}</div>
             </div>
             {% if current_user.is_authenticated %}
                 {% if enrollment_existed %}
@@ -79,7 +79,7 @@
                 </div>
                 {% endif %}
             {% else %}
-                <a href="/login-account">Đăng nhập để đăng ký khóa học này...</a>
+                <a href="/login-account?next=/courses/{{ course.id }}">Đăng nhập để đăng ký khóa học này...</a>
             {% endif %}
         </div>
     </div>

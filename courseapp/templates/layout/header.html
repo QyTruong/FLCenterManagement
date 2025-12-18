@@ -6,37 +6,21 @@
         </button>
         <div class="collapse navbar-collapse" id="collapsibleNavbar">
             <ul class="navbar-nav me-auto">
+<!--                Phần chung-->
                 <li class="nav-item">
                     <a class="nav-link" href="/">Trang chủ</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('course_list') }}">Khóa học</a>
+                    <a class="nav-link" href="/">Giới thiệu</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Giới thiệu</a>
-                </li>
-                {% if current_user.is_authenticated %}
-                <li class="nav-item">
-                    {% if current_user.role.avatar %}
-                        <img src="{{ current_user.role.avatar }}" alt="{{ current_user.role.name }}" class="rounded-circle" width="40">
-                    {% else %}
-                        <img src="{{ url_for('static', filename='images/default_avatar.jpg') }}" alt="{{ current_user.role.name }}" class="rounded-circle" width="40">
-                    {% endif %}
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('logout_account') }}">Đăng xuất</a>
-                </li>
-                {% else %}
-                <li class="nav-item">
-                    <a class="nav-link" href="/login-account">Đăng nhập</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('register_account') }}">Đăng ký</a>
-                </li>
-                {% endif %}
 
+<!--                Xác thực-->
                 {% if current_user.is_authenticated %}
-                      <!-- Hary -->
+                    {% if current_user.student %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('course_list') }}">Khóa học</a>
+                    </li>
+                    <!-- Hary -->
                     {% if current_user.student %}
                     <li class="nav-item dropdown" >
                         <a class="nav-link dropdown-toggle text-warning " href="#" id="myLearningDropdown" role="button"data-bs-toggle="dropdown" aria-expanded="false">My Learning</a>
@@ -52,32 +36,74 @@
                             </li>
                         </ul>
                     </li>
+                        {% if current_user.student.avatar %}
+                        <li class="nav-item">
+                            <img src="{{ current_user.student.avatar }}" alt="{{ current_user.student.name }}" class="rounded-circle" width="40" height="40" style="object-fit: cover;">
+                            <span class="ml-2 text-white">{{ current_user.student.name }}</span>
+                        </li>
+                        {% else %}
+                        <li class="nav-item">
+                            <img src="{{ url_for('static', filename='images/default_avatar.jpg') }}" alt="{{ current_user.student.name }}" class="rounded-circle" width="40" height="40" style="object-fit: cover;">
+                            <span class="ml-2 text-white">{{ current_user.student.name }}</span>
+                        </li>
+                        {% endif %}
+                    {% elif current_user.teacher %}
+                    <!-- giao vien-->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-info" href="#" id="myClassDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            My Class
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="myClassDropdown">
+                            <li><a class="dropdown-item" href="/teacher-profile">Thông tin cá nhân</a></li>
+                            <li><a class="dropdown-item" href="/teacher-sections">Danh sách lớp dạy</a></li>
+                            <li><a class="dropdown-item" href="/teacher-input-score">Nhập điểm</a></li>
+                            <li><a class="dropdown-item" href="/teacher-attendance">Điểm danh</a></li>
+                        </ul>
+                    </li>
+
+                        {% if current_user.teacher.avatar %}
+                        <li class="nav-item">
+                            <img src="{{ current_user.teacher.avatar }}" alt="{{ current_user.teacher.name }}" class="rounded-circle" width="40" height="40" style="object-fit: cover;">
+                            <span class="ml-2 text-white">{{ current_user.teacher.name }}</span>
+                        </li>
+                        {% else %}
+                        <li class="nav-item">
+                            <img src="{{ url_for('static', filename='images/default_avatar.jpg') }}" alt="{{ current_user.teacher.name }}" class="rounded-circle" width="40" height="40" style="object-fit: cover;">
+                            <span class="ml-2 text-white">{{ current_user.teacher.name }}</span>
+                        </li>
+                        {% endif %}
+                    {% elif current_user.staff and not current_user.staff.is_admin %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/staff-enroll-section">Đăng ký khóa học</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/invoice-creating">Lập hóa đơn</a>
+                    </li>
+
+                        {% if current_user.staff.avatar %}
+                        <li class="nav-item">
+                            <img src="{{ current_user.staff.avatar }}" alt="{{ current_user.staff.name }}" class="rounded-circle" width="40" height="40" style="object-fit: cover;">
+                            <span class="ml-2 text-white">{{ current_user.staff.name }}</span>
+                        </li>
+                        {% else %}
+                        <li class="nav-item">
+                            <img src="{{ url_for('static', filename='images/default_avatar.jpg') }}" alt="{{ current_user.staff.name }}" class="rounded-circle" width="40" height="40" style="object-fit: cover;">
+                            <span class="ml-2 text-white">{{ current_user.staff.name }}</span>
+                        </li>
+                        {% endif %}
                     {% endif %}
-
-                <!-- giao vien-->
-
-                 {% if current_user.teacher %}
-
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle text-info" href="#" id="myClassDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        My Class
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="myClassDropdown">
-                        <li><a class="dropdown-item" href="/teacher-profile">Thông tin cá nhân</a></li>
-                        <li><a class="dropdown-item" href="/teacher-sections">Danh sách lớp dạy</a></li>
-                        <li><a class="dropdown-item" href="/teacher-input-score">Nhập điểm</a></li>
-                        <li><a class="dropdown-item" href="/teacher-attendance">Điểm danh</a></li>
-                    </ul>
-                </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout_account') }}">Đăng xuất</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/login-account">Đăng nhập</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('register_account') }}">Đăng ký</a>
+                    </li>
                 {% endif %}
 
-<!-- avatar-->
-                <li class="nav-item d-flex align-items-center ms-2">
-                    {% if current_user.role and current_user.role.avatar %}
-                    <img src="{{ current_user.role.avatar }}" alt="{{ current_user.role.name }}" class="rounded-circle" width="40">
-                    {% endif %}
-                </li>
-                {% endif %}
 
             </ul>
         </div>

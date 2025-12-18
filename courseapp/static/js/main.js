@@ -1,7 +1,7 @@
 function enrollSection(){
-    let selected = document.querySelector('input[name="section"]:checked')
+    let selectedSection = document.querySelector('input[name="section"]:checked')
 
-    if (!selected){
+    if (!selectedSection){
         alert('Vui lòng chọn lớp trước khi đăng ký')
         return
     }
@@ -9,8 +9,7 @@ function enrollSection(){
     fetch('/api/enroll-section', {
         method: "POST",
         body: JSON.stringify({
-            "section_id" : selected.value,
-            "price" : selected.dataset.price
+            "section_id" : selectedSection.value
         }),
         headers: {
             "Content-Type" : "application/json"
@@ -19,9 +18,32 @@ function enrollSection(){
         alert(data.message)
 
         location.reload()
-    })
+    }).catch(err => console.error(err))
 }
 
+function enrollSectionByStaff(){
+    let student = document.getElementById("student")
+    let section = document.getElementById("section")
+
+    if (!student || !section){
+        alert('Vui lòng chọn đầy đủ thông tin trước khi đăng ký !!')
+    }
+
+    fetch('/api/staff-enroll-section', {
+        method: "POST",
+        body: JSON.stringify({
+            "student_id" : student.value,
+            "section_id" : section.value
+        }),
+        headers: {
+            "Content-Type": "application/json"
+        }
+    }).then(res => res.json()).then(data => {
+        alert(data.message)
+
+        location.reload()
+    }).catch(err => console.error(err))
+}
 
 function cancelSection(enrollment_existed_id){
 
@@ -39,4 +61,3 @@ function cancelSection(enrollment_existed_id){
         location.reload()
     }).catch(err => console.error(err))
 }
-

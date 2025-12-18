@@ -4,58 +4,58 @@
     "classroom_id": 1,
     "course_id": 1,
     "current_size": 1,
-    "teacher_id": 6
+    "teacher_id": null
   },
   {
     "schedule": "T2-T4-T6: 7h-10h",
     "classroom_id": 2,
     "course_id": 1,
     "current_size": 2,
-    "teacher_id":6
+    "teacher_id": null
   },
   {
     "schedule": "T2-T4-T6: 7h-10h",
     "classroom_id": 3,
     "course_id": 2,
-    "teacher_id": 6
+    "teacher_id": null
   },
   {
     "schedule": "T2-T4-T6: 7h-10h",
     "classroom_id": 4,
     "course_id": 2,
-    "teacher_id": 6
+    "teacher_id": null
   },
   {
     "schedule": "T2-T4-T6: 7h-10h",
     "classroom_id": 5,
     "course_id": 3,
-    "teacher_id": 6
+    "teacher_id": null
   },
   {
     "schedule": "T2-T4-T6: 17h-20h",
     "classroom_id": 1,
     "course_id": 3,
-    "teacher_id": 6
+    "teacher_id": null
   },
   {
     "schedule": "T2-T4-T6: 17h-20h",
     "classroom_id": 2,
     "course_id": 2,
     "current_size": 1,
-    "teacher_id": 6
+    "teacher_id": null
   },
   {
     "schedule": "T2-T4-T6: 17h-20h",
     "classroom_id": 3,
     "course_id": 2,
     "current_size": 2,
-    "teacher_id": 6
+    "teacher_id": null
   },
   {
     "schedule": "T2-T4-T6: 17h-20h",
     "classroom_id": 4,
     "course_id": 1,
-    "teacher_id": 6
+    "teacher_id": null
   },
   {
     "schedule": "T2-T4-T6: 17h-20h",
