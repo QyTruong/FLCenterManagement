@@ -1,34 +1,73 @@
-<!--{% extends 'layout/base.html'  %}-->
+{% extends 'layout/base.html'  %}
 
-<!--{% block title %}Chi tiết khóa học{% endblock %}-->
+{% block title %}Chi tiết khóa học{% endblock %}
 
-<!--{% block content %}-->
+{% block content %}
 
-<!--{% if request.args.get('err_msg') %}-->
-<!--<div class="alert alert-danger d-flex align-items-center">-->
-<!--    <div>{{ request.args.get('err_msg') }}</div>-->
-<!--    <button type="button" class="close ml-auto" data-dismiss="alert">x</button>-->
-<!--</div>-->
-<!--{% endif %}-->
+{% if request.args.get('err_msg') %}
+<div class="alert alert-danger d-flex align-items-center">
+    <div>{{ request.args.get('err_msg') }}</div>
+    <button type="button" class="close ml-auto" data-dismiss="alert">x</button>
+</div>
+{% endif %}
 
-<!--{% if request.args.get('msg') %}-->
-<!--<div class="alert alert-success d-flex align-items-center">-->
-<!--    <div>{{ request.args.get('msg') }}</div>-->
-<!--    <button type="button" class="close ml-auto" data-dismiss="alert">x</button>-->
-<!--</div>-->
-<!--{% endif %}-->
+{% if request.args.get('msg') %}
+<div class="alert alert-success d-flex align-items-center">
+    <div>{{ request.args.get('msg') }}</div>
+    <button type="button" class="close ml-auto" data-dismiss="alert">x</button>
+</div>
+{% endif %}
 
-<!--<h1 class="text-center">Trang lập hóa đơn</h1>-->
-<!--<label for="student">Chọn học viên</label>-->
-<!--<select class="form-control" name="student_id" id="student">-->
-<!--    <option value="">Chọn học viên</option>-->
-<!--    {% for s in students %}-->
-<!--    <option value="{{ s.id }}">Tên học viên: {{ s.name }}</option>-->
-<!--    {% endfor %}-->
-<!--</select>-->
+<h1 class="text-center">Trang lập hóa đơn</h1>
+<form method="get" action="/invoice-creating">
+    <label for="student">Chọn học viên</label>
+    <select class="form-control" name="student_id" id="student">
+    <option value="">Chọn học viên</option>
+    {% for s in students %}
+    <option value="{{ s.id }}" class="{% if 'student_id' in request.args and s.id==request.args.student_id|int %} selected {% endif %}">
+        Tên học viên: {{ s.name }}
+    </option>
+    {% endfor %}
+</select>
 
-<!--<h2 class="text-center mt-5">Danh sách hóa đơn</h2>-->
+    <button type="submit" class="btn btn-danger w-100 mt-3">Lọc</button>
+</form>
 
 
+<h2 class="text-center mt-5">Hóa đơn</h2>
+{% if enrollments %}
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Tên học viên</th>
+            <th>Tên khóa học</th>
+            <th>Giá tiền</th>
+            <th>Ngày nộp</th>
+            <th>Trạng thái thanh toán</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for e in enrollments %}
+        <tr>
+            <td>{{ e[3] }}</td>
+            <td>{{ e[4] }}</td>
+            <td>{{ "{:,.0f}".format(e[0]) }} VND</td>
+            <td>{{ e[1] }}</td>
+            <td>{{ e[2] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr>
+            <td>Tổng tiền:</td>
+            <td colspan="4" class="text-center">{{ "{:,.0f}".format(total) }} VND</td>
+        </tr>
+    </tfoot>
+</table>
+<button class="btn btn-primary mb-5 w-100">Thanh toán</button>
+{% else %}
+    <p class="text-center">Vui lòng chọn học viên để lập hóa đơn</p>
+{% endif %}
 
-<!--{% endblock %}-->
+
+{% endblock %}
