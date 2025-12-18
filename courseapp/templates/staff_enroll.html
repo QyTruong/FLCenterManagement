@@ -64,17 +64,17 @@
     <tbody>
         {% for e in enrollments %}
         <tr>
-            <td>{{ e.id }}</td>
-            <td>{{ e.student }}</td>
-            <td>{{ e.section.course }}</td>
-            <td>{{ e.section.classroom }}</td>
-            <td>{{ e.enroll_date }}</td>
-            <td>{{ e.status.name }}</td>
-            {% if e.status.name == 'CANCELLED' %}
+            <td>{{ e[0] }}</td>
+            <td>{{ e[5] }}</td>
+            <td>{{ e[6] }}</td>
+            <td>{{ e[7] }}</td>
+            <td>{{ e[4] }}</td>
+            <td>{{ e[2].name }}</td>
+            {% if e[2].name == "CANCELLED" %}
             <td>Đã hủy</td>
             {% else %}
             <td>
-                <button class="btn btn-sm btn-danger" onclick="cancelSection({{ e.id }})">X</button>
+                <button class="btn btn-sm btn-danger" onclick="cancelSection({{ e[0] }})">X</button>
             </td>
             {% endif %}
         </tr>

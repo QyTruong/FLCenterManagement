@@ -15,9 +15,17 @@ def send_email_enrollment(course_name, classroom_name, schedule, unit_price, stu
                                           f'Chúc mừng bạn đã đăng ký thành công khóa học {course_name}\n'
                                           f'Tên lớp: {classroom_name}\n' f'Phiên học: {schedule}\n'
                                           f'Giá tiền: {formatted_price}\n'
-                                          f'Vui lòng đến trung tâm đóng học trước ngày 1/1/2026\n'
+                                          f'Vui lòng đến trung tâm đóng học phí kể từ nhận được mail này sau 7 ngày\n'
                                           f'Địa chỉ trung tâm: 12/233D/9/23/45D đường ABC, phường XYZ\n'
                                           f'Xin cảm ơn.')
 
         sg = SendGridAPIClient(app.config['SENDGRID_API_KEY'])
         sg.send(message)
+
+
+def cal_amount(enrollment_list):
+    total = 0
+    for e in enrollment_list:
+        total += e.unit_price
+
+    return total

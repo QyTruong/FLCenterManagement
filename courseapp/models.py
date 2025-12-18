@@ -41,16 +41,6 @@ class User(BaseModel, UserMixin):
     student = relationship("Student", backref="user", lazy=True, uselist=False)
     teacher = relationship("Teacher", backref="user", lazy=True, uselist=False)
 
-    @property
-    def role(self):
-        if self.staff:
-            return self.staff
-        elif self.student:
-            return self.student
-        elif self.teacher:
-            return self.teacher
-        return None
-
 class Staff(db.Model):
     __tablename__ = 'staff'
 
@@ -114,8 +104,8 @@ class Enrollment(BaseModel):
     unit_price = Column(Float, nullable=False)
     student_id = Column(Integer, ForeignKey('student.id'), nullable=False)
     section_id = Column(Integer, ForeignKey('section.id'), nullable=False)
+    invoice_id = Column(Integer, ForeignKey('invoice.id'), nullable=True)
 
-    invoice = relationship('Invoice', backref='enrollment', lazy=True, uselist=False)
     scores = relationship('Score', backref='enrollment', lazy=True)
 
 class Score(BaseModel):
@@ -129,11 +119,12 @@ class Score(BaseModel):
 class Invoice(BaseModel):
     __tablename__ = 'invoice'
 
-    id = Column(Integer, ForeignKey(Enrollment.id), primary_key=True, unique=True, nullable=False)
     amount = Column(Float, nullable=False)
     payment_date = Column(DateTime)
     payment_status = Column(Enum(PaymentStatus), default=PaymentStatus.PENDING)
     staff_id = Column(Integer, ForeignKey(Staff.id), nullable=True)
+
+    enrollments = relationship('Enrollment', backref='invoice', lazy=True)
 
 class Section(BaseModel):
     __tablename__ = 'section'
@@ -248,13 +239,13 @@ if __name__ == '__main__':
                 db.session.add(c)
             db.session.commit()
 
-        # Invoice
-        with open('data/invoices.json', 'r', encoding='utf-8') as f:
-            data = json.load(f)
-            for inv in data:
-                c = Invoice(**inv)
-                db.session.add(c)
-            db.session.commit()
+        # # Invoice
+        # with open('data/invoices.json', 'r', encoding='utf-8') as f:
+        #     data = json.load(f)
+        #     for inv in data:
+        #         c = Invoice(**inv)
+        #         db.session.add(c)
+        #     db.session.commit()
 
         # #User
         # with open('data/users.json', 'r', encoding='utf-8') as f:
