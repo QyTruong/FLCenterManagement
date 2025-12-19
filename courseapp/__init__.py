@@ -5,7 +5,6 @@ import cloudinary.uploader
 import os
 from dotenv import load_dotenv
 
-
 app = Flask(__name__)
 load_dotenv()
 

@@ -3,19 +3,10 @@
 {{ super() }}
 
 {% if current_user.is_authenticated and current_user.staff %}
-<h2 class="text-success text-center mt-1">Chào mừng đến trang quản trị</h2>
 
-<div class="row pt-1">
-    <div class="col-md-3 col-xs-12">
-
-    </div>
-    <div class="col-md-3 col-xs-12">
-
-    </div>
-    <div class="col-md-3 col-xs-12">
-
-    </div>
-</div>
+{% block content %}
+{% include 'admin/cards.html' %}
+{% endblock %}
 
 <div class="row pt-2 pl-1">
     <div class="col-md-5 col-xs-12">
@@ -63,53 +54,40 @@
 
     window.onload = function(){
     const ctx = document.getElementById('myCourseChart').getContext('2d');
-     const myChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: 'Thống kê bài học trong khóa học',
-        data: data,
-        backgroundColor: colors,
-        borderColor: borderColor,
-        borderWidth: 1
-      }]
-    },
-    options: {
-      options: {
-    responsive: true,
-    maintainAspectRatio: false
-}
+    loadChart(ctx, labels, data, 'bar', colors,borderColor)
     }
-  });
-  }
+
+function loadChart(ctx,labels, data, type, colors, borderColor){
+     const myChart = new Chart(ctx, {
+        type: type,
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Số lượng bài học',
+            data: data,
+            backgroundColor: colors,
+            borderColor: borderColor,
+            borderWidth: 1
+          }]
+        },
+        options: {
+        responsive: true,
+        maintainAspectRatio: false
+        }
+     });
+}
 </script>
 
 
 {% else %}
 <h3 class="alert alert-danger">Bạn cần đăng nhập với vai trò là nhân viên!</h3>
 
-<!--<h2 class="text-success text-center">ĐĂNG NHẬP TRANG QUẢN TRỊ</h2>-->
-
-<!--<div class="center-box">-->
-<!--    <form method="post" action="/login-account" style="width: 500px;"  class="pb-5">-->
-<!--    <div class="form-group" >-->
-<!--        <label for="name">Tên đăng nhập:</label>-->
-<!--        <input type="text" class="form-control" placeholder="tên đăng nhập" id="name" name="username">-->
-<!--    </div>-->
-<!--    <div class="form-group">-->
-<!--        <label for="pwd">Mật khẩu:</label>-->
-<!--        <input type="password" class="form-control" placeholder="nhâp mật khẩu" id="pwd" name="password">-->
-<!--    </div>-->
-<!--    <button type="submit" class="btn btn-primary">Đăng nhập</button>-->
-<!--</form>-->
-<!--</div>-->
 {% endif %}
 <footer>
-  <div class="jumbotron">
-  <h1>E-commerce Website</h1>
-  <p>Wis &copy; 2021</p>
-</div>
+    <div class="jumbotron">
+        <h1>E-commerce Website</h1>
+        <p>Wis &copy; 2021</p>
+    </div>
 </footer>
 {% endblock %}
 
