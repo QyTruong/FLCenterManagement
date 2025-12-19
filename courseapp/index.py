@@ -5,9 +5,9 @@ from flask_login import login_user, logout_user, current_user
 import cloudinary.uploader
 
 
-
 @app.route('/')
 def index():
+
     return render_template('index.html')
 
 @app.route('/courses')
@@ -21,7 +21,9 @@ def course_detail(course_id):
     lessons = dao.get_lessons_by_course_id(course_id=course_id)
     course = dao.get_course_by_id(course_id=course_id)
     sections = dao.get_sections_by_course_id(course_id=course_id)
-    enrollment_existed = dao.get_enrollment_existed(course_id=course_id)
+    enrollment_existed = None
+    if current_user.is_authenticated:
+        enrollment_existed = dao.get_enrollment_existed(course_id=course_id, student_id=current_user.id)
 
     return render_template('course_detail.html',
                            lessons=lessons,
@@ -34,11 +36,10 @@ def course_detail(course_id):
 def enroll_section():
     section_id = int(request.json.get('section_id'))
     section = dao.get_section_by_id(section_id=section_id)
-    unit_price = section.course.price
-    schedule = section.schedule
-    classroom_name = section.classroom.name
-    course_name = section.course.name
-
+    schedule = section[0]
+    unit_price = section[2]
+    course_name = section[3]
+    classroom_name = section[4]
 
     try:
         schedule_existed = dao.check_schedule_existed(schedule=schedule, student_id=current_user.id)
@@ -48,9 +49,9 @@ def enroll_section():
                 return {'message': 'Lớp học đã đủ số lượng học viên, vui lòng đăng ký lớp khác'}
             else:
                 utils.send_email_enrollment(course_name=course_name, classroom_name=classroom_name, schedule=schedule, unit_price=unit_price, student=current_user.student)
-                return {'message': 'Đăng ký thành công'}
+                return {'message': 'Đăng ký thành công !!'}
         else:
-            return {'message': f'Phiên học {schedule_existed} đã được đăng ký, vui lòng đăng phiên học khác'}
+            return {'message': f'Phiên học {schedule_existed} đã được đăng ký, vui lòng đăng phiên học khác !!'}
 
     except Exception as e:
         return {'message': str(e)}
@@ -65,42 +66,60 @@ def cancel_section():
     except Exception as e:
         return {'message': str(e)}
 
-    return {'message': 'Hủy đăng ký thành công'}
+    return {'message': 'Hủy đăng ký thành công !!'}
 
 
-# @app.route('/staff-enroll-section')
-# def staff_enroll_section_view():
-#     students = dao.get_students()
-#     sections = dao.get_sections()
-#     enrollments = dao.get_enrollments()
-#
-#     return render_template('staff_enroll.html',
-#                            students=students,
-#                            sections=sections,
-#                            enrollments=enrollments)
+@app.route('/staff-enroll-section')
+def staff_enroll_section_view():
+    students = dao.get_students()
+    sections = dao.get_sections()
+    enrollments = dao.get_enrollment_list()
 
-# @app.route('/staff-enroll-section', methods='POST')
-# def staff_enroll_section():
-#     student_id = request.form.get('student_id')
-#     section_id = request.form.get('section_id')
-#     section = dao.get_section_by_id(section_id=section_id)
-#     unit_price = section.course.price
-#     schedule = section.schedule
-#
-#     try:
-#         schedule_existed = dao.check_schedule_existed(schedule=schedule, student_id=student_id)
-#         if not schedule_existed:
-#             enroll = dao.add_to_enrollment(section_id=section_id, unit_price=unit_price, student_id=student_id)
-#             if not enroll:
-#                 return render_template('staff_enroll.html', err_msg='Lớp học đã đủ số lượng học viên, vui lòng đăng ký lớp khác')
-#             else:
-#                 return render_template('staff_enroll.html', err_msg='Đăng ký thành công')
-#         else:
-#             return render_template('staff_enroll.html', err_msg=f'Phiên học {schedule_existed} đã được đăng ký, vui lòng đăng phiên học khác')
-#
-#     except Exception as e:
-#         return {'message': str(e)}
+    return render_template('staff_enroll.html',
+                           students=students,
+                           sections=sections,
+                           enrollments=enrollments)
 
+@app.route('/api/staff-enroll-section', methods=["POST"])
+def staff_enroll_section():
+    student_id = request.json.get('student_id')
+    section_id = request.json.get('section_id')
+    section = dao.get_section_by_id(section_id=section_id)
+    schedule = section[0]
+    course_id = section[1]
+    unit_price = section[2]
+    enrollment_existed = dao.get_enrollment_existed(course_id=course_id, student_id=student_id)
+
+    try:
+        if enrollment_existed:
+            return {'message': 'Học viên đã đăng ký khóa học này, vui lòng đăng ký khóa học khác !!'}
+
+        schedule_existed = dao.check_schedule_existed(schedule=schedule, student_id=student_id)
+        if not schedule_existed:
+            enroll = dao.add_to_enrollment(section_id=section_id, unit_price=unit_price, student_id=student_id)
+            if not enroll:
+                return {'message': 'Lớp học đã đủ số lượng học viên, vui lòng đăng ký lớp khác !!'}
+            else:
+                return {'message': 'Đăng ký thành công'}
+        else:
+            return {'message': f'Phiên học {schedule_existed} đã được đăng ký, vui lòng đăng phiên học khác !!'}
+
+    except Exception as e:
+        return {'message': str(e)}
+
+
+@app.route('/invoice-creating')
+def invoice_creating():
+    student_id = request.args.get('student_id')
+    students = dao.get_students()
+    enrollments = None
+    total = None
+
+    if student_id:
+        enrollments = dao.get_invoices_by_student_id(student_id=student_id)
+        total = utils.cal_amount(enrollments)
+
+    return render_template('invoice_creating.html', students=students, enrollments=enrollments, total=total)
 
 @app.route('/register-account', methods=['GET', 'POST'])
 def register_account():
@@ -123,7 +142,7 @@ def register_account():
                 dao.add_user(name=name, username=username, password=password, email=email, avatar=avatar_path)
                 return redirect(url_for('login_account'))
             else:
-                err_msg = 'Mật khẩu xác nhận không khớp !!!'
+                err_msg = 'Mật khẩu xác nhận không khớp !!'
         except Exception as ex:
             err_msg = 'Hệ thống đang gặp lỗi: ' + str(ex)
 
@@ -145,7 +164,6 @@ def login_account():
     if user:
         login_user(user=user)
         next = request.args.get('next')
-        print(next)
 
         if user.staff and user.staff.is_admin:
            return redirect('/admin')
@@ -153,7 +171,7 @@ def login_account():
         return redirect(next if next else '/')
 
     else:
-        err_msg = 'Tài khoản hoặc mật khẩu không đúng'
+        err_msg = 'Tài khoản hoặc mật khẩu không đúng !!'
 
     return render_template('account_login.html', err_msg=err_msg)
 
@@ -171,3 +189,20 @@ if __name__ == '__main__':
     from courseapp.admin import admin
 
     app.run(debug=True)
+    # with app.app_context():
+    #     from flask_login import login_user
+    #
+    #     with app.test_request_context('/'):
+    #         user = dao.auth_user('student1', '1')
+    #         login_user(user)
+    #         print(user.admin.name)
+    #
+    #     # load_user(user_id=user.id)
+    #     # print(current_user.student.name)
+
+    # result1 = cloudinary.uploader.upload("static/images/beginner.png")
+    # result2 = cloudinary.uploader.upload("static/images/intermediate.jpg")
+    # result3 = cloudinary.uploader.upload("static/images/advanced.jpg")
+    # print(result1['secure_url'])
+    # print(result2['secure_url'])
+    # print(result3['secure_url'])

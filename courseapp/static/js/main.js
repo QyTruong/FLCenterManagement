@@ -18,9 +18,32 @@ function enrollSection(){
         alert(data.message)
 
         location.reload()
-    })
+    }).catch(err => console.error(err))
 }
 
+function enrollSectionByStaff(){
+    let student = document.getElementById("student")
+    let section = document.getElementById("section")
+
+    if (!student || !section){
+        alert('Vui lòng chọn đầy đủ thông tin trước khi đăng ký !!')
+    }
+
+    fetch('/api/staff-enroll-section', {
+        method: "POST",
+        body: JSON.stringify({
+            "student_id" : student.value,
+            "section_id" : section.value
+        }),
+        headers: {
+            "Content-Type": "application/json"
+        }
+    }).then(res => res.json()).then(data => {
+        alert(data.message)
+
+        location.reload()
+    }).catch(err => console.error(err))
+}
 
 function cancelSection(enrollment_existed_id){
 
@@ -36,6 +59,5 @@ function cancelSection(enrollment_existed_id){
         alert(data.message)
 
         location.reload()
-    })
+    }).catch(err => console.error(err))
 }
-

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlalchemy.exc import IntegrityError
 from models import Course, Lesson, Classroom, User, Student, Teacher, Staff, Section, Enrollment, Invoice, Score, Result, EnrollStatus
 import hashlib
@@ -13,10 +15,48 @@ def get_students():
     return Student.query.all()
 
 def get_sections():
-    return Section.query.all()
+    return Section.query.order_by(Section.course_id).all()
 
-def get_enrollments():
-    return Enrollment.query.all()
+def get_enrollment_list():
+    query = db.session.query(
+                            Enrollment.id,
+                            Enrollment.unit_price,
+                            Enrollment.status,
+                            Enrollment.invoice_id,
+                            Enrollment.enroll_date,
+                            Student.name,
+                            Course.name,
+                            Classroom.name
+                        ).join(Student, Enrollment.student_id.__eq__(Student.id))\
+                        .join(Section, Enrollment.section_id.__eq__(Section.id))\
+                        .join(Classroom, Section.classroom_id.__eq__(Classroom.id))\
+                        .join(Course, Section.course_id.__eq__(Course.id))\
+                        .order_by(Student.name)
+
+    return query.all()
+
+def get_invoices_by_student_id(student_id=None):
+    query = db.session.query(
+            Enrollment.unit_price,
+            Invoice.payment_date,
+            Invoice.payment_status,
+            Student.name,
+            Course.name,
+            Enrollment.id
+        ).join(Student, Enrollment.student_id.__eq__(Student.id)) \
+            .join(Invoice, Enrollment.invoice_id.__eq__(Invoice.id))\
+            .join(Section, Enrollment.section_id.__eq__(Section.id))\
+            .join(Course, Section.course_id.__eq__(Course.id)) \
+            .filter(
+                Enrollment.status.__eq__(EnrollStatus.REGISTERED)
+            )
+
+    if student_id:
+        query = query.filter(Enrollment.student_id.__eq__(student_id))
+
+    print(query.all())
+
+    return query.all()
 
 def get_lessons_by_course_id(course_id):
     query = Lesson.query.filter(Lesson.active.__eq__(True))
@@ -41,7 +81,17 @@ def get_sections_by_course_id(course_id):
     return query.all()
 
 def get_section_by_id(section_id):
-    return Section.query.get(section_id)
+    query = db.session.query(
+                            Section.schedule,
+                            Course.id,
+                            Course.price,
+                            Course.name,
+                            Classroom.name
+                        ).join(Course, Section.course_id == Course.id)\
+                        .join(Classroom, Section.course_id == Course.id)\
+                        .filter(Section.id == section_id)
+
+    return query.first()
 
 def get_user_by_id(user_id):
     return User.query.get(user_id)
@@ -97,15 +147,10 @@ def add_to_enrollment(section_id, unit_price, student_id):
     if section.current_size < classroom.capacity:
         if enrollment_cancelled_existing:
             enrollment_cancelled_existing.status = EnrollStatus.REGISTERED
-            invoice_unactive_existing = Invoice.query.filter(
-                Invoice.id.__eq__(enrollment_cancelled_existing.id)
-            ).first()
-            invoice_unactive_existing.active = True
+            enrollment_cancelled_existing.enroll_date = datetime.now()
         else:
-            invoice = Invoice(amount=unit_price)
-            enrollment = Enrollment(student_id=student_id, section_id=section_id, unit_price=unit_price, invoice=invoice)
+            enrollment = Enrollment(student_id=student_id, section_id=section_id, unit_price=unit_price, invoice_id=None)
             db.session.add(enrollment)
-            db.session.add(invoice)
 
         section.current_size += 1
         db.session.commit()
@@ -121,26 +166,21 @@ def cancel_enrollment(enrollment_id):
 
     if section.current_size > 0 and enrollment:
         enrollment.status = EnrollStatus.CANCELLED
-        invoice_active_existing = Invoice.query.filter(
-            Invoice.id.__eq__(enrollment.id)
-        ).first()
-        invoice_active_existing.active = False
+        enrollment.enroll_date = datetime.now()
         section.current_size -= 1
         db.session.commit()
 
-def get_enrollment_existed(course_id):
-    if current_user.is_authenticated:
-        query = db.session.query(Enrollment)\
-            .join(Section, Section.id == Enrollment.section_id)\
-            .filter(
-            Enrollment.student_id.__eq__(current_user.id),
-            Section.course_id.__eq__(course_id),
-            Enrollment.status.__eq__(EnrollStatus.REGISTERED)
-        ).first()
+def get_enrollment_existed(course_id, student_id):
+    query = db.session.query(Enrollment)\
+        .join(Section, Section.id == Enrollment.section_id)\
+        .filter(
+        Enrollment.student_id.__eq__(student_id),
+        Section.course_id.__eq__(course_id),
+        Enrollment.status.__eq__(EnrollStatus.REGISTERED)
+    ).first()
 
-        return query
+    return query
 
-    return None
 
 
 #------THÔNG KÊ---------
