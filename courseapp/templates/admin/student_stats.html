@@ -2,7 +2,12 @@
 {% block body %}
 {{ super() }}
 {% if current_user.is_authenticated and current_user.staff%}
-<h1 class="text-center text-danger">THỐNG KÊ số lượng học viên</h1>
+
+{% block content %}
+    {% include 'admin/cards.html' %}
+{% endblock %}
+
+<h1 class="text-center text-danger">Thống kê số lượng học viên</h1>
 <div class="row pt-3 pl-2">
     <div class="col-md-5 col-xs-12">
        <table class="table table-bordered">

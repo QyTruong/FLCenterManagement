@@ -147,7 +147,7 @@ def login_account():
         next = request.args.get('next')
         print(next)
 
-        if user.staff:
+        if user.staff and user.staff.is_admin:
            return redirect('/admin')
 
         return redirect(next if next else '/')
