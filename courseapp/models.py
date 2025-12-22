@@ -183,18 +183,19 @@ if __name__ == '__main__':
                            avatar='https://res.cloudinary.com/dl0b32hii/image/upload/v1763480359/ksw7wx53ma3edyfrqh8q.jpg')
         student3 = Student(name='student3', email='truong.4725212@gmail.com',
                            avatar='https://res.cloudinary.com/dl0b32hii/image/upload/v1763480359/ksw7wx53ma3edyfrqh8q.jpg')
-
+        teacher1 = Teacher(name='teacher1', email='truong.4725212@gmail.com',
+                           avatar='https://res.cloudinary.com/dl0b32hii/image/upload/v1763480359/ksw7wx53ma3edyfrqh8q.jpg')
 
         u1 = User(username='admin', password=str(hashlib.md5('1'.encode('utf-8')).hexdigest()), staff=s1)
         u2 = User(username='staff1', password=str(hashlib.md5('1'.encode('utf-8')).hexdigest()), staff=s2)
         u3 = User(username='student1', password=str(hashlib.md5('1'.encode('utf-8')).hexdigest()), student=student1)
         u4 = User(username='student2', password=str(hashlib.md5('1'.encode('utf-8')).hexdigest()), student=student2)
         u5 = User(username='student3', password=str(hashlib.md5('1'.encode('utf-8')).hexdigest()), student=student3)
-
-        db.session.add_all([u1, u2, u3, u4, u5])
+        u6 = User(username='teacher1', password=str(hashlib.md5('1'.encode('utf-8')).hexdigest()), teacher=teacher1)
+        db.session.add_all([u1, u2, u3, u4, u5,u6])
 
         db.session.add_all([s1,s2])
-        db.session.add_all([student1,student2,student3])
+        db.session.add_all([student1,student2,student3,teacher1])
 
         db.session.commit()
 

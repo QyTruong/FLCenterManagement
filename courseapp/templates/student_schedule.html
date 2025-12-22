@@ -1,0 +1,34 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Lịch học{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">📅 Lịch học của tôi</h2>
+
+    {% if schedule %}
+    <table class="table table-bordered table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th>#</th>
+                <th>Khóa học</th>
+                <th>Lịch học</th>
+                <th>Phòng</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sec in schedule %}
+            <tr>
+                <td>{{ loop.index }}</td>  {# dùng loop.index thay cho enumerate #}
+                <td>{{ sec.course.name }}</td>
+                <td>{{ sec.schedule }}</td>
+                <td>{{ sec.classroom.name if sec.classroom else 'Chưa có' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Chưa có lịch học nào.</p>
+    {% endif %}
+</div>
+{% endblock %}

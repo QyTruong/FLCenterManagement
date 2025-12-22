@@ -1,0 +1,37 @@
+<!--{% extends 'layout/base.html' %}-->
+
+<!--{% block title %}Danh sách lớp dạy{% endblock %}-->
+
+<!--{% block content %}-->
+<!--<h2>Danh sách lớp bạn đang dạy</h2>-->
+
+<!--<table class="table table-bordered">-->
+<!--    <thead>-->
+<!--        <tr>-->
+<!--            <th>#</th>-->
+<!--            <th>Tên lớp</th>-->
+<!--            <th>Lịch học</th>-->
+<!--            <th>Hành động</th>-->
+<!--        </tr>-->
+<!--    </thead>-->
+<!--    <tbody>-->
+<!--        {% for sec in sections %}-->
+<!--            <tr>-->
+<!--                <td>{{ s.id }}</td>-->
+<!--                <td>{{ s.course.name }}</td>-->
+<!--                <td>{{ s.schedule }}</td>-->
+<!--                <td>-->
+<!--                    <a class="btn btn-primary btn-sm"-->
+<!--                       href="{{ url_for('teacher_input_scores', section_id=s.id) }}">-->
+<!--                        Nhập điểm-->
+<!--                    </a>-->
+<!--                </td>-->
+<!--            </tr>-->
+<!--        {% else %}-->
+<!--        <tr>-->
+<!--            <td colspan="4">Chưa có lớp nào</td>-->
+<!--        </tr>-->
+<!--        {% endfor %}-->
+<!--    </tbody>-->
+<!--</table>-->
+<!--{% endblock %}-->

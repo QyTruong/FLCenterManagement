@@ -234,3 +234,141 @@ def pass_rate_stats(from_date=None, to_date=None):
         q = q.filter(Enrollment.enroll_date.__le__(to_date))
 
     return q.all()
+
+
+
+#========================================= Hary
+# ============================
+# STUDENT
+# ============================
+def get_student_profile(student_id):
+    return Student.query.get(student_id)
+
+def update_student_profile(student_id, name, email):
+    student = Student.query.get(student_id)
+    if student:
+        student.name = name
+        student.email = email
+        db.session.commit()
+    return student
+
+
+def get_course_by_student(student_id):
+    q = (
+        db.session.query(Course)
+        .join(Section)
+        .join(Enrollment)
+        .filter(Enrollment.student_id == student_id)
+        .distinct()
+    )
+    return q.all()
+
+
+def get_schedule_of_student(student_id):
+    """
+    Lấy lịch học của student (rút gọn), trả về list Section
+    """
+    q = (
+        db.session.query(Section)
+        .join(Course)
+        .join(Enrollment)
+        .filter(Enrollment.student_id == student_id)
+        .distinct()
+    )
+    return q.all()
+
+
+def get_scores_of_student(student_id):
+    """
+    Lấy danh sách điểm của student
+    """
+    return db.session.query(
+        Score,
+        Course.name.label("course_name"),
+        Section.id.label("section_id")
+    ).join(
+        Enrollment, Score.enrollment_id == Enrollment.id
+    ).join(
+        Section, Section.id == Enrollment.section_id
+    ).join(
+        Course, Course.id == Section.course_id
+    ).filter(
+        Enrollment.student_id == student_id
+    ).all()
+
+#=============TEACHER========
+# Lấy teacher theo id
+def get_teacher_by_id(teacher_id):
+    return Teacher.query.get(teacher_id)
+
+# Cập nhật thông tin teacher
+def update_teacher_profile(teacher_id, name=None, email=None, avatar=None, specialization=None):
+    teacher = Teacher.query.get(teacher_id)
+    if teacher:
+        if name is not None:
+            teacher.name = name
+        if email is not None:
+            teacher.email = email
+        if avatar is not None:
+            teacher.avatar = avatar
+        if specialization is not None:
+            teacher.specialization = specialization
+        db.session.commit()
+    return teacher
+
+#teacher section hary
+# --- DAO cho Teacher ---
+
+# Lấy tất cả sections mà teacher đang dạy
+# DAO cho teacher
+def get_sections_by_teacher(teacher_id):
+    q = (
+        db.session.query(Section)
+        .join(Course, Course.id == Section.course_id)
+        .join(Classroom, Classroom.id == Section.classroom_id)
+        .filter(Section.teacher_id == teacher_id)
+        .all()
+    )
+    return q
+
+
+# Lấy danh sách học viên trong Section
+def get_students_by_section(section_id):
+    q = (
+        db.session.query(Student)
+        .join(Enrollment, Enrollment.student_id == Student.id)
+        .filter(
+            Enrollment.section_id == section_id
+        )
+        .all()
+    )
+    return q
+
+
+
+def get_enrollments_by_section(section_id):
+    return (
+        db.session.query(Enrollment, Student)
+        .join(Student, Student.id == Enrollment.student_id)
+        .filter(Enrollment.section_id == section_id)
+        .all()
+    )
+
+#luu diem
+def save_score(enrollment_id, score_value, score_type, attendance=0):
+    s = Score.query.filter(
+        Score.enrollment_id == enrollment_id,
+        Score.type == score_type
+    ).first()
+
+    if not s:
+        s = Score(
+            enrollment_id=enrollment_id,
+            type=score_type,
+            score=score_value,
+            result=Result.FAILURE
+        )
+        db.session.add(s)
+
+    s.score = score_value
+    db.session.commit()
