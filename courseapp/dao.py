@@ -2,7 +2,7 @@ from datetime import datetime
 
 from sqlalchemy.exc import IntegrityError
 from models import Course, Lesson, Classroom, User, Student, Teacher, Staff, Section, Enrollment, Invoice, Score, \
-    Result, EnrollStatus, PaymentStatus
+    Result, PaymentStatus
 import hashlib
 from courseapp import db
 from flask_login import current_user
@@ -22,8 +22,7 @@ def get_enrollments_pending(student_id=None):
     query = db.session.query(
                 Enrollment,
             ).join(Invoice, Enrollment.invoice_id.__eq__(Invoice.id)) \
-                .filter(
-                Enrollment.status.__eq__(EnrollStatus.REGISTERED),
+            .filter(
                 Invoice.payment_status.__eq__(PaymentStatus.PENDING)
             )
 
@@ -37,8 +36,7 @@ def get_enrollments_paid(student_id=None):
     query = db.session.query(
                 Enrollment,
             ).join(Invoice, Enrollment.invoice_id.__eq__(Invoice.id)) \
-                .filter(
-                Enrollment.status.__eq__(EnrollStatus.REGISTERED),
+            .filter(
                 Invoice.payment_status.__eq__(PaymentStatus.PAID)
             )
 
@@ -60,7 +58,6 @@ def get_enrollment_list():
     query = db.session.query(
                             Enrollment.id,
                             Enrollment.unit_price,
-                            Enrollment.status,
                             Enrollment.enroll_date,
                             Student.name,
                             Course.name,
@@ -138,7 +135,6 @@ def check_schedule_existed(schedule, student_id):
     query = db.session.query(Section) \
         .join(Enrollment, Enrollment.section_id == Section.id) \
         .filter(
-            Enrollment.status.__eq__(EnrollStatus.REGISTERED),
             Enrollment.student_id.__eq__(student_id),
             Section.schedule.__eq__(schedule)
         )
@@ -178,10 +174,9 @@ def get_enrollment_existed(course_id, student_id):
     query = db.session.query(Enrollment)\
         .join(Section, Section.id == Enrollment.section_id)\
         .filter(
-        Enrollment.student_id.__eq__(student_id),
-        Section.course_id.__eq__(course_id),
-        Enrollment.status.__eq__(EnrollStatus.REGISTERED)
-    ).first()
+            Enrollment.student_id.__eq__(student_id),
+            Section.course_id.__eq__(course_id)
+        ).first()
 
     return query
 
@@ -215,10 +210,7 @@ def get_invoice_info(student_id=None):
         ).join(Student, Enrollment.student_id.__eq__(Student.id)) \
             .join(Invoice, Enrollment.invoice_id.__eq__(Invoice.id))\
             .join(Section, Enrollment.section_id.__eq__(Section.id))\
-            .join(Course, Section.course_id.__eq__(Course.id))\
-            .filter(
-                Enrollment.status.__eq__(EnrollStatus.REGISTERED)
-            )
+            .join(Course, Section.course_id.__eq__(Course.id))
 
     if student_id:
         query = query.filter(Enrollment.student_id.__eq__(student_id))

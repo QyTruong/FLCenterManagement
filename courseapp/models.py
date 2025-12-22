@@ -6,10 +6,6 @@ from datetime import datetime
 from enum import Enum as Type
 from flask_login import UserMixin
 
-class EnrollStatus(Type):
-    REGISTERED = 1
-    CANCELLED = 2
-
 class PaymentStatus(Type):
     PENDING = 1
     PAID = 2
@@ -100,7 +96,6 @@ class Enrollment(BaseModel):
     __tablename__ = 'enrollment'
 
     enroll_date = Column(DateTime, default=datetime.now())
-    status = Column(Enum(EnrollStatus), nullable=False, default=EnrollStatus.REGISTERED)
     unit_price = Column(Float, nullable=False)
     student_id = Column(Integer, ForeignKey('student.id'), nullable=False)
     section_id = Column(Integer, ForeignKey('section.id'), nullable=False)
