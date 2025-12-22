@@ -13,14 +13,13 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/">Giới thiệu</a>
                 </li>
+                <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('course_list') }}">Khóa học</a>
+                </li>
 
 <!--                Xác thực-->
                 {% if current_user.is_authenticated %}
                     {% if current_user.student %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('course_list') }}">Khóa học</a>
-                    </li>
-
                         {% if current_user.student.avatar %}
                         <li class="nav-item">
                             <img src="{{ current_user.student.avatar }}" alt="{{ current_user.student.name }}" class="rounded-circle" width="40" height="40" style="object-fit: cover;">
@@ -51,7 +50,7 @@
                         <a class="nav-link" href="/staff-enroll-section">Đăng ký khóa học</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/invoice-creating">Lập hóa đơn</a>
+                        <a class="nav-link" href="/invoice-view">Lập hóa đơn</a>
                     </li>
 
                         {% if current_user.staff.avatar %}

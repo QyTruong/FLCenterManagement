@@ -39,6 +39,7 @@ function enrollSectionByStaff(){
             "Content-Type": "application/json"
         }
     }).then(res => res.json()).then(data => {
+
         alert(data.message)
 
         location.reload()
@@ -46,7 +47,6 @@ function enrollSectionByStaff(){
 }
 
 function cancelSection(enrollment_existed_id){
-
     fetch('/api/cancel-section', {
         method: "PATCH",
         body: JSON.stringify({
@@ -58,6 +58,40 @@ function cancelSection(enrollment_existed_id){
     }).then(res => res.json()).then(data => {
         alert(data.message)
 
+        location.reload()
+    }).catch(err => console.error(err))
+}
+
+function creatingInvoice(invoice_id){
+    let student = document.getElementById('student')
+    let student_id = student.value
+
+    fetch('/api/creating-invoice', {
+        method: 'POST',
+        body: JSON.stringify({
+            "student_id": student_id,
+            "invoice_id": invoice_id
+        }),
+        headers: {
+            "Content-Type": "application/json"
+        }
+    }).then(res => res.json()).then(data => {
+        alert(data.message)
+        location.reload()
+    }).catch(err => console.error(err))
+}
+
+function pay(invoice_id){
+    fetch('/api/pay', {
+        method: 'PATCH',
+        body: JSON.stringify({
+            "invoice_id": invoice_id
+        }),
+        headers: {
+            "Content-Type": "application/json"
+        }
+    }).then(res => res.json()).then(data => {
+        alert(data.message)
         location.reload()
     }).catch(err => console.error(err))
 }

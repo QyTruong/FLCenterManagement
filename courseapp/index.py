@@ -1,8 +1,32 @@
-from flask import render_template, request, jsonify, url_for, session
+from functools import wraps
+
+from flask import render_template, request, jsonify, url_for, session, abort
 from werkzeug.utils import redirect
 from courseapp import app, dao, login, utils
 from flask_login import login_user, logout_user, current_user
 import cloudinary.uploader
+
+# def login_required(*roles):
+#     def decorator(f):
+#         @wraps(f)
+#         def decorated_function(*args, **kwargs):
+#             dict_role = {
+#                 'student' : current_user.student,
+#                 'teacher' : current_user.teacher,
+#                 'staff' : current_user.staff,
+#             }
+#             if current_user.is_authenticated:
+#                 if dict_role[roles[0]]:
+#                     return f(*args, **kwargs)
+#                 else:
+#                     return {'message': ''}
+#             else:
+#                 return {'message' : 'Vui lòng đăng nhập để sử dụng chức năng này'}
+#
+#
+#         return decorated_function
+#
+#     return decorator
 
 
 @app.route('/')
@@ -108,18 +132,49 @@ def staff_enroll_section():
         return {'message': str(e)}
 
 
-@app.route('/invoice-creating')
-def invoice_creating():
+@app.route('/invoice-view')
+def invoice_view():
     student_id = request.args.get('student_id')
     students = dao.get_students()
-    enrollments = None
-    total = None
+    invoice_infos = None
+    invoice_id = None
+    amount_paid = 0
+    amount_unpaid = 0
 
     if student_id:
-        enrollments = dao.get_invoices_by_student_id(student_id=student_id)
-        total = utils.cal_amount(enrollments)
+        invoice_infos = dao.get_invoice_info(student_id=student_id)
+        enrollments_pending = dao.get_enrollments_pending(student_id=student_id)
+        invoice_id = dao.get_invoices_by_student_id(student_id=student_id)
+        enrollments_paid = dao.get_enrollments_paid(student_id=student_id)
+        amount_paid = utils.cal_amount(enrollments=enrollments_paid)
+        amount_unpaid = utils.cal_amount(enrollments=enrollments_pending)
 
-    return render_template('invoice_creating.html', students=students, enrollments=enrollments, total=total)
+    return render_template('invoice_view.html', students=students, invoice_infos=invoice_infos, invoice_id=invoice_id, amount_paid=amount_paid, amount_unpaid=amount_unpaid, student_id=student_id)
+
+@app.route('/api/creating-invoice', methods=['POST'])
+def creating_invoice():
+    try:
+        student_id = request.json.get('student_id')
+        invoice_id = request.json.get('invoice_id')
+        enrollments = dao.get_enrollments(student_id=student_id)
+        dao.create_invoice(enrollments=enrollments, invoice_id=invoice_id)
+
+    except Exception as e:
+        return {'message': str(e)}
+
+    return {'message': 'Lập hóa đơn thành công'}
+
+@app.route('/api/pay', methods=['PATCH'])
+def pay():
+    invoice_id = request.json.get('invoice_id')
+
+    try:
+        dao.pay_invoice(invoice_id=invoice_id)
+    except Exception as e:
+        return {'message': str(e)}
+
+    return {'message': 'Thanh toán thành công'}
+
 
 @app.route('/register-account', methods=['GET', 'POST'])
 def register_account():

@@ -119,7 +119,6 @@ class Score(BaseModel):
 class Invoice(BaseModel):
     __tablename__ = 'invoice'
 
-    amount = Column(Float, nullable=False)
     payment_date = Column(DateTime)
     payment_status = Column(Enum(PaymentStatus), default=PaymentStatus.PENDING)
     staff_id = Column(Integer, ForeignKey(Staff.id), nullable=True)
