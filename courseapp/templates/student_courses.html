@@ -1,0 +1,57 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Khóa học của tôi{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <!-- Cột trái: Avatar + Menu -->
+        <div class="col-md-3 text-center">
+            <img src="{{ current_user.student.avatar or url_for('static', filename='images/default_avatar.jpg') }}"
+                 class="rounded-circle mb-3" width="150" height="150">
+
+            <div class="list-group text-start">
+                <a href="{{ url_for('student_profile') }}" class="list-group-item list-group-item-action">
+                    Thông tin cá nhân
+                </a>
+                <a href="{{ url_for('student_courses') }}" class="list-group-item list-group-item-action active">
+                    Khóa học của tôi
+                </a>
+                <a href="{{ url_for('student_scores') }}" class="list-group-item list-group-item-action">
+                    Xem điểm
+                </a>
+                <a href="{{ url_for('student_schedule') }}" class="list-group-item list-group-item-action">
+                    Lịch học
+                </a>
+            </div>
+        </div>
+
+        <!-- Cột phải: Nội dung -->
+        <div class="col-md-9">
+            <h3 class="mb-4">📚 Khóa học của tôi</h3>
+
+            {% if courses %}
+                <div class="row">
+                    {% for course in courses %}
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <img class="card-img-top" src="{{ course.image or url_for('static', filename='images/default_course.jpg') }}" alt="{{ course.name }}">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ course.name }}</h5>
+                                <p class="card-text">{{ course.description or 'Chưa có mô tả' }}</p>
+                                <p class="mb-1"><strong>Ngày bắt đầu:</strong> {{ course.start_date }}</p>
+                                <p class="mb-1"><strong>Ngày kết thúc:</strong> {{ course.end_date }}</p>
+                                <p class="card-text"><b>Giá tiền:</b> {{ "{:,.0f}".format(course.price) }} VND</p>
+                                <a href="/course/{{ course.id }}" class="btn btn-success btn-sm">Xem chi tiết</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>Bạn chưa đăng ký khóa học nào.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

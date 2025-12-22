@@ -1,12 +1,17 @@
 <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand text-success" href="/">English Center</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
+
+        <button class="navbar-toggler" type="button"
+                data-toggle="collapse"
+                data-target="#collapsibleNavbar">
             <span class="navbar-toggler-icon"></span>
         </button>
+
         <div class="collapse navbar-collapse" id="collapsibleNavbar">
-            <ul class="navbar-nav me-auto">
-<!--                Phần chung-->
+            <ul class="navbar-nav mr-auto">
+
+                <!-- Phần chung -->
                 <li class="nav-item">
                     <a class="nav-link" href="/">Trang chủ</a>
                 </li>
@@ -14,61 +19,80 @@
                     <a class="nav-link" href="/">Giới thiệu</a>
                 </li>
 
-<!--                Xác thực-->
                 {% if current_user.is_authenticated %}
+
                     {% if current_user.student %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('course_list') }}">Khóa học</a>
-                    </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('course_list') }}">Khóa học</a>
+                        </li>
 
-                        {% if current_user.student.avatar %}
+                        <!-- My Learning -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-warning" href="#"
+                               id="myLearningDropdown" role="button"
+                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                My Learning
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="myLearningDropdown">
+                                <a class="dropdown-item" href="/student-profile">Thông tin cá nhân</a>
+                                <a class="dropdown-item" href="/student-courses">Khóa học của tôi</a>
+                                <a class="dropdown-item" href="/student-score">Xem điểm</a>
+                            </div>
+                        </li>
+
+                        <!-- Avatar -->
                         <li class="nav-item">
-                            <img src="{{ current_user.student.avatar }}" alt="{{ current_user.student.name }}" class="rounded-circle" width="40" height="40" style="object-fit: cover;">
+                            <img src="{{ current_user.student.avatar or url_for('static', filename='images/default_avatar.jpg') }}"
+                                 alt="{{ current_user.student.name }}"
+                                 class="rounded-circle" width="40" height="40" style="object-fit: cover;">
                             <span class="ml-2 text-white">{{ current_user.student.name }}</span>
                         </li>
-                        {% else %}
-                        <li class="nav-item">
-                            <img src="{{ url_for('static', filename='images/default_avatar.jpg') }}" alt="{{ current_user.student.name }}" class="rounded-circle" width="40" height="40" style="object-fit: cover;">
-                            <span class="ml-2 text-white">{{ current_user.student.name }}</span>
-                        </li>
-                        {% endif %}
+
                     {% elif current_user.teacher %}
-                    <p>Còn thiếu...</p>
+                        <!-- My Class -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-info" href="#"
+                               id="myClassDropdown" role="button"
+                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                My Class
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="myClassDropdown">
+                                <a class="dropdown-item" href="/teacher-profile">Thông tin cá nhân</a>
+                                <a class="dropdown-item" href="/teacher-sections">Danh sách lớp dạy</a>
+                                <a class="dropdown-item" href="/teacher-input-scores">Nhập điểm</a>
+                                <a class="dropdown-item" href="/teacher-attendance">Điểm danh</a>
+                            </div>
+                        </li>
 
-                        {% if current_user.teacher.avatar %}
+                        <!-- Avatar -->
                         <li class="nav-item">
-                            <img src="{{ current_user.teacher.avatar }}" alt="{{ current_user.teacher.name }}" class="rounded-circle" width="40" height="40" style="object-fit: cover;">
+                            <img src="{{ current_user.teacher.avatar or url_for('static', filename='images/default_avatar.jpg') }}"
+                                 alt="{{ current_user.teacher.name }}"
+                                 class="rounded-circle" width="40" height="40" style="object-fit: cover;">
                             <span class="ml-2 text-white">{{ current_user.teacher.name }}</span>
                         </li>
-                        {% else %}
-                        <li class="nav-item">
-                            <img src="{{ url_for('static', filename='images/default_avatar.jpg') }}" alt="{{ current_user.teacher.name }}" class="rounded-circle" width="40" height="40" style="object-fit: cover;">
-                            <span class="ml-2 text-white">{{ current_user.teacher.name }}</span>
-                        </li>
-                        {% endif %}
+
                     {% elif current_user.staff and not current_user.staff.is_admin %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="/staff-enroll-section">Đăng ký khóa học</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/invoice-creating">Lập hóa đơn</a>
-                    </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/staff-enroll-section">Đăng ký khóa học</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/invoice-creating">Lập hóa đơn</a>
+                        </li>
 
-                        {% if current_user.staff.avatar %}
+                        <!-- Avatar -->
                         <li class="nav-item">
-                            <img src="{{ current_user.staff.avatar }}" alt="{{ current_user.staff.name }}" class="rounded-circle" width="40" height="40" style="object-fit: cover;">
+                            <img src="{{ current_user.staff.avatar or url_for('static', filename='images/default_avatar.jpg') }}"
+                                 alt="{{ current_user.staff.name }}"
+                                 class="rounded-circle" width="40" height="40" style="object-fit: cover;">
                             <span class="ml-2 text-white">{{ current_user.staff.name }}</span>
                         </li>
-                        {% else %}
-                        <li class="nav-item">
-                            <img src="{{ url_for('static', filename='images/default_avatar.jpg') }}" alt="{{ current_user.staff.name }}" class="rounded-circle" width="40" height="40" style="object-fit: cover;">
-                            <span class="ml-2 text-white">{{ current_user.staff.name }}</span>
-                        </li>
-                        {% endif %}
                     {% endif %}
+
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('logout_account') }}">Đăng xuất</a>
                     </li>
+
                 {% else %}
                     <li class="nav-item">
                         <a class="nav-link" href="/login-account">Đăng nhập</a>

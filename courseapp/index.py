@@ -1,8 +1,9 @@
 from flask import render_template, request, jsonify, url_for, session
 from werkzeug.utils import redirect
-from courseapp import app, dao, login, utils
+from courseapp import app, dao, login, utils,db
 from flask_login import login_user, logout_user, current_user
 import cloudinary.uploader
+
 
 
 @app.route('/')
@@ -183,6 +184,175 @@ def logout_account():
 @login.user_loader
 def load_user(user_id):
     return dao.get_user_by_id(user_id)
+
+#=============================
+
+
+
+
+
+
+# ==============================
+# STUDENT PROFILE
+# ==============================
+@app.route("/student-profile")
+def student_profile():
+    if not current_user.is_authenticated or not current_user.student:
+        return redirect(url_for("login_account"))
+
+    student = current_user.student
+    return render_template("student_profile.html", student=student)
+
+
+@app.route("/student-profile/edit", methods=["GET", "POST"])
+def student_profile_edit():
+    if not current_user.is_authenticated or not current_user.student:
+        return redirect(url_for("login_account"))
+
+    student = current_user.student
+
+    if request.method == "POST":
+        student.name = request.form.get("name")
+        student.email = request.form.get("email")
+        db.session.commit()
+        return redirect(url_for("student_profile"))
+
+    return render_template("student_profile_edit.html", student=student)
+
+
+
+@app.route("/student-courses")
+def student_courses():
+    if not current_user.is_authenticated or not current_user.student:
+        return redirect(url_for("login_account"))
+
+    # Lấy danh sách khóa học của student từ db
+    courses = dao.get_course_by_student(current_user.id)  # hoặc logic của mày
+    return render_template("student_courses.html", courses=courses)
+
+@app.route("/course/<int:course_id>")
+def student_course_detail(course_id):
+    course = dao.Course.query.get(course_id)
+    if not course:
+        return "Khóa học không tồn tại", 404
+    course.video_beginner = "https://www.youtube.com/embed/PCmX6q-gfJ8?start=124"
+    course.video_intermediate = "https://www.youtube.com/embed/_nuQ39Y4T5Q?start=300"  # Ví dụ video khác
+    course.video_advanced = "https://www.youtube.com/embed/EWaakfWfaWw?start=600"
+    return render_template("student_courses_detail.html", course=course)
+
+
+@app.route("/student-schedule")
+def student_schedule():
+    if not current_user.is_authenticated or not current_user.student:
+        return redirect(url_for("login_account"))
+
+    # Giả sử mày muốn lấy lịch học của student
+    schedule = dao.get_schedule_of_student(current_user.id)  # hoặc logic của mày
+    return render_template("student_schedule.html", schedule=schedule)
+
+
+@app.route("/student-scores")
+def student_scores():
+    if not current_user.is_authenticated or not current_user.student:
+        return redirect(url_for('login_account'))
+
+    from courseapp.dao import get_scores_of_student
+    scores = get_scores_of_student(current_user.student.id)
+
+    return render_template("student_scores.html", scores=scores)
+
+
+#=========================TEACHER=================
+# teacher_profile_edit
+# Hiển thị thông tin cá nhân teacher
+@app.route("/teacher-profile")
+def teacher_profile():
+    # Giả sử current_user.id là teacher.id
+    teacher = dao.get_teacher_by_id(current_user.id)
+    if not teacher:
+        return "Teacher không tồn tại", 404
+    return render_template("teacher_profile.html", teacher=teacher)
+
+# Chỉnh sửa profile teacher
+@app.route("/teacher-profile-edit", methods=["GET", "POST"])
+def teacher_profile_edit():
+    teacher = dao.get_teacher_by_id(current_user.id)
+    if not teacher:
+        return "Teacher không tồn tại", 404
+
+    if request.method == "POST":
+        name = request.form.get("name")
+        email = request.form.get("email")
+        avatar = request.form.get("avatar")
+        specialization = request.form.get("specialization")
+        dao.update_teacher_profile(teacher.id, name, email, avatar, specialization)
+        return redirect(url_for("teacher_profile"))
+
+    return render_template("teacher_profile_edit.html", teacher=teacher)
+
+
+# Danh sách lớp dạy
+
+#
+# @app.route("/teacher-sections")
+# def teacher_sections():
+#     if not current_user.is_authenticated or not current_user.teacher:
+#         return redirect(url_for("login_account"))
+#
+#     # Lấy danh sách lớp mà teacher đang dạy
+#     teacher_id = current_user.teacher.id
+#     sections = dao.get_sections_by_teacher(current_user.id)
+#     return render_template("teacher_sections.html", sections=sections)
+#
+#
+#
+# @app.route("/teacher-sections/<int:section_id>/students")
+# def teacher_view_students(section_id):
+#     students = dao.get_students_by_section(section_id)
+#     return render_template("teacher_view_students.html", students=students)
+
+
+
+
+# @app.route("/teacher-section/<int:section_id>/score", methods=["GET", "POST"])
+# def teacher_input_scores(section_id):
+#     if not current_user.is_authenticated or not current_user.teacher:
+#         return redirect(url_for("login_account"))
+#
+#     students = dao.get_students_by_section(section_id)
+#     # [(Enrollment, Student), ...]
+#
+#     if request.method == "POST":
+#         for enrollment, student in students:
+#             mid = float(request.form.get(f"mid_{student.id}", 0))
+#             final = float(request.form.get(f"final_{student.id}", 0))
+#             att = 1 if request.form.get(f"att_{student.id}") else 0
+#
+#             dao.save_score(enrollment.id, mid, "mid")
+#             dao.save_score(enrollment.id, final, "final")
+#             dao.save_score(enrollment.id, att, "att")
+#
+#         return redirect(url_for("teacher_sections"))
+#
+#     return render_template(
+#         "teacher_input_scores.html",
+#         students=students
+#     )
+#
+# @app.route("/teacher-input-scores")
+# def teacher_input_score_default():
+#     if not current_user.is_authenticated or not current_user.teacher:
+#         return redirect(url_for("login_account"))
+#
+#     sections = dao.get_sections_by_teacher(current_user.id)
+#
+#     if not sections:
+#         return "Bạn chưa có lớp nào để nhập điểm", 404
+#
+#     return redirect(url_for(
+#         "teacher_input_scores",
+#         section_id=sections[0].id
+#     ))
 
 
 if __name__ == '__main__':

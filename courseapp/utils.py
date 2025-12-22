@@ -29,3 +29,26 @@ def cal_amount(enrollment_list):
         total += e.unit_price
 
     return total
+
+def calculate_rank(score):
+    if score is None:
+        return ""
+    if score >= 90:
+        return "Xuất sắc"
+    if score >= 80:
+        return "Giỏi"
+    if score >= 65:
+        return "Khá"
+    if score >= 50:
+        return "Trung bình"
+    return "Yếu"
+
+
+def default_comment(rank):
+    return {
+        "Xuất sắc": "Rất tốt, giỏi",
+        "Giỏi": "Học tốt",
+        "Khá": "Tạm được",
+        "Trung bình": "Cần cố gắng",
+        "Yếu": "Cần học lại nghiêm túc"
+    }.get(rank, "")
