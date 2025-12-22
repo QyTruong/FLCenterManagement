@@ -23,9 +23,9 @@ def send_email_enrollment(course_name, classroom_name, schedule, unit_price, stu
         sg.send(message)
 
 
-def cal_amount(enrollment_list):
+def cal_amount(enrollments):
     total = 0
-    for e in enrollment_list:
+    for e in enrollments:
         total += e.unit_price
 
     return total
