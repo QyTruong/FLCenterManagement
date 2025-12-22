@@ -1,0 +1,107 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Chi tiết khóa học{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <!-- Header & Mô tả ngắn -->
+    <div class="jumbotron bg-light p-4">
+        <h1 class="display-5">{{ course.name }}</h1>
+        <p class="lead">{{ course.description }}</p>
+        <p>
+            <b>Tags:</b>
+            {% if course.tags %}
+                {% for tag in course.tags %}
+                    <span class="badge badge-primary">{{ tag }}</span>
+                {% endfor %}
+            {% else %}
+                🔥 Gói Starter 🔥
+            {% endif %}
+        </p>
+    </div>
+
+    <!-- Những gì bạn sẽ học -->
+    <div class="card mb-4">
+        <div class="card-header bg-warning text-dark">
+            Những gì bạn sẽ học
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">Làm chủ bảng phiên âm IPA để phát âm chuẩn.</li>
+            <li class="list-group-item">Vượt qua rào cản tâm lý "sợ sai".</li>
+            <li class="list-group-item">Nắm vững 500+ từ vựng cốt lõi và cấu trúc ngữ pháp.</li>
+            <li class="list-group-item">Phản xạ nghe - nói tức thì với các chủ đề cơ bản.</li>
+        </ul>
+    </div>
+
+    <!-- Nội dung khóa học -->
+    <div class="mb-4">
+        <h3>Nội dung khóa học</h3>
+        <div id="accordion">
+            {% for section in course.sections %}
+            <div class="card">
+                <div class="card-header" id="heading{{ loop.index }}">
+                    <h5 class="mb-0">
+                        <button class="btn btn-link" data-toggle="collapse" data-target="#collapse{{ loop.index }}" aria-expanded="true" aria-controls="collapse{{ loop.index }}">
+                            {{ section.name or "Chương " ~ loop.index }}
+                        </button>
+                    </h5>
+                </div>
+
+                <div id="collapse{{ loop.index }}" class="collapse {% if loop.first %}show{% endif %}" aria-labelledby="heading{{ loop.index }}" data-parent="#accordion">
+                    <div class="card-body">
+                        <p><b>Mục tiêu:</b> {{ section.objective or "Xây dựng nền tảng tư duy đúng đắn..." }}</p>
+                        <ul>
+                            {% for lesson in section.lessons %}
+                            <li>#{{ loop.index }} {{ lesson.title or "Tên bài học" }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Video Demo & Mô tả chi tiết -->
+    <div class="row mb-5">
+        <div class="col-md-6">
+            <div class="embed-responsive embed-responsive-16by9">
+                <iframe class="embed-responsive-item" src="{{ course.video_url or 'https://www.youtube.com/embed/PCmX6q-gfJ8' }}" allowfullscreen></iframe>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <h4>Mô tả chi tiết</h4>
+            <p>{{ course.long_description or "Khóa học không chỉ là lý thuyết khô khan. Đây là kết quả của hơn 10 năm kinh nghiệm giảng dạy và làm việc trong môi trường quốc tế..." }}</p>
+        </div>
+    </div>
+
+    <!-- Bình luận / Đánh giá học viên -->
+    <div class="card mb-4">
+        <div class="card-header bg-secondary text-white">
+            Bình luận của học viên
+        </div>
+        <div class="card-body">
+            <!-- Comment demo -->
+            <div class="mb-3">
+                <p><b>Nguyễn Văn A:</b> Khóa học rất bổ ích, dễ hiểu và dễ áp dụng.</p>
+            </div>
+            <div class="mb-3">
+                <p><b>Trần Thị B:</b> Mình thích cách giảng viên giải thích từng bước, rất chi tiết.</p>
+            </div>
+            <div class="mb-3">
+                <p><b>Phạm Văn C:</b> Video demo giúp mình hình dung rõ lộ trình học, rất thực tế.</p>
+            </div>
+
+            <!-- Form nhập comment demo -->
+            <form>
+                <div class="form-group">
+                    <label for="comment">Viết bình luận của bạn:</label>
+                    <textarea class="form-control" id="comment" name="comment" rows="3" placeholder="Nhập bình luận..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary mt-2">Gửi bình luận</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

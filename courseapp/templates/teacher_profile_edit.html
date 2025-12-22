@@ -1,0 +1,28 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Chỉnh sửa giáo viên{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h3>Chỉnh sửa thông tin giáo viên</h3>
+    <form method="POST">
+        <div class="form-group">
+            <label>Họ và tên</label>
+            <input type="text" name="name" class="form-control" value="{{ teacher.name }}">
+        </div>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" name="email" class="form-control" value="{{ teacher.email }}">
+        </div>
+        <div class="form-group">
+            <label>Avatar URL</label>
+            <input type="text" name="avatar" class="form-control" value="{{ teacher.avatar }}">
+        </div>
+        <div class="form-group">
+            <label>Chuyên môn</label>
+            <input type="text" name="specialization" class="form-control" value="{{ teacher.specialization }}">
+        </div>
+        <button type="submit" class="btn btn-success mt-3">Cập nhật</button>
+    </form>
+</div>
+{% endblock %}

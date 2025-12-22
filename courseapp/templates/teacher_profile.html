@@ -1,0 +1,61 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Thông tin giáo viên{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 text-center">
+            <img src="{{ teacher.avatar or url_for('static', filename='images/default_avatar.jpg') }}"
+                 class="rounded-circle mb-3" width="150" height="150">
+
+            <div class="list-group text-start">
+                <a href="{{ url_for('teacher_profile') }}" class="list-group-item list-group-item-action active">
+                    Thông tin cá nhân
+                </a>
+                <a href="{{ url_for('teacher_sections') }}" class="list-group-item list-group-item-action">
+                    Danh sách lớp dạy
+                </a>
+                <a href="teacher_input_scores" class="list-group-item list-group-item-action">
+                    Nhập điểm
+                </a>
+                <a href="#" class="list-group-item list-group-item-action">
+                    Điểm danh
+                </a>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <div class="col-md-9">
+            <h3 class="mb-4">Thông tin giáo viên</h3>
+            <table class="table">
+                <tr>
+                    <th>Họ và Tên</th>
+                    <td>{{ teacher.name }}</td>
+                    <td class="text-end">
+                        <a href="{{ url_for('teacher_profile_edit') }}" class="text-success">Chỉnh sửa</a>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Email</th>
+                    <td>{{ teacher.email }}</td>
+                    <td class="text-end text-muted"><i class="fa fa-lock"></i></td>
+                </tr>
+                <tr>
+                    <th>Avatar</th>
+                    <td>
+                        <img src="{{ teacher.avatar or url_for('static', filename='images/default_avatar.jpg') }}" width="80" height="80">
+                    </td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th>Chuyên môn</th>
+                    <td>{{ teacher.specialization or "Chưa có" }}</td>
+                    <td></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
